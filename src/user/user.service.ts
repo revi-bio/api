@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 
 @Injectable()
-export class User {
+export class UserService {
     constructor(
-        private readonly userModel: Model<User>,
+        private readonly userModel: Model<UserService>,
     ) {}
 
     async createUser(data: {
