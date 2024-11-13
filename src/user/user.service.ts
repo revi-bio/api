@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { User, UserDocument } from 'src/types/schema/User';
 import * as argon2 from 'argon2';
 
@@ -8,6 +8,18 @@ export class UserService {
     constructor(
         private readonly userModel: Model<User>,
     ) {}
+
+    async findById(id: Types.ObjectId): Promise<UserDocument | undefined> {
+        return await this.userModel.findById(id);
+    }
+
+    async findByEmail(email: string): Promise<UserDocument | undefined> {
+        return await this.userModel.findOne({ email });
+    }
+
+    getFind() { return this.userModel.find };
+
+    getFindOne() { return this.userModel.findOne };
 
     async createUser(data: {
         displayName: string;

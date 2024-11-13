@@ -10,3 +10,11 @@ export class RegisterUserDto {
     @IsString()
     displayName: string;
 }
+
+export class LoginUserDto {
+    @IsString()
+    email: string;
+
+    @IsString()
+    password: string;
+}
