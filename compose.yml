@@ -1,0 +1,4 @@
+services:
+  db:
+    image: docker.io/mongo:latest
+    
