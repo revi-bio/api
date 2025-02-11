@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
 import { User, UserDocument } from 'src/types/schema/User';
 import * as argon2 from 'argon2';
@@ -30,6 +30,10 @@ export class UserService {
     }): Promise<UserDocument> {
         const { displayName, email, password } = data;
 
+        const userWithSameEmail = await this.userModel.findOne({ email });
+        if (userWithSameEmail)
+            throw new ConflictException({ message: 'There is already a user with this email' });
+
         const dbUser = new this.userModel({
             displayName,
             email,
@@ -39,7 +43,7 @@ export class UserService {
             // Password hashing is very important because it's private information that's
             // dangerous for us to store in plaintext. Argon2 is one of the best algorithms for
             // this task, so we use that.
-            password: argon2.hash(password),
+            password: await argon2.hash(password),
         });
 
         await dbUser.save();
