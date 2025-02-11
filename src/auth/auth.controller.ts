@@ -20,7 +20,7 @@ export class AuthController {
     async login(@Body() body: LoginUserDto) {
         const { email, password } = body;
 
-        const dbUser = await this.userService.getFindOne()({ email });
+        const dbUser = await this.userService.findByEmail(email);
 
         if (!dbUser) {
             throw new HttpException('no such username or password', HttpStatus.FORBIDDEN);
