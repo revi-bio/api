@@ -5,6 +5,7 @@ import { LoginUserDto, RegisterUserDto } from './auth.validation';
 import * as argon2 from 'argon2';
 import { sign, verify } from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
+import { Public } from './public.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -14,6 +15,7 @@ export class AuthController {
         private readonly configService: ConfigService,
     ) {}
 
+    @Public()
     @Post('login')
     async login(@Body() body: LoginUserDto) {
         const { email, password } = body;
@@ -40,6 +42,7 @@ export class AuthController {
         }
     }
 
+    @Public()
     @Post('register')
     async register(@Body() body: RegisterUserDto) {
         const { displayName, email, password } = body;
