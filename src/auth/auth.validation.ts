@@ -1,4 +1,4 @@
-import { IsAlphanumeric, IsString, Length, Matches } from "class-validator";
+import { IsAlphanumeric, IsString, IsStrongPassword, Length, Matches, MaxLength } from "class-validator";
 
 export class RegisterUserDto {
     @IsString()
@@ -6,9 +6,12 @@ export class RegisterUserDto {
     email: string;
 
     @IsString()
-    @Length(8, 64)
-    @Matches(/(?=.[A-Z])(?=.[a-z])(?=.\d)(?=.[!@#$%^&*(),.?":{}|<>]).{8,}/, {
-        message: 'password must be strong'
+    @MaxLength(64)
+    @IsStrongPassword({
+        minLength: 8,
+        minNumbers: 1,
+        minUppercase: 1,
+        minSymbols: 1,
     })
     password: string;
 
