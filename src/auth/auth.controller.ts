@@ -1,4 +1,4 @@
-import { Body, Controller, HttpException, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, HttpException, HttpStatus, Post, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
 import { LoginUserDto, RegisterUserDto } from './auth.validation';
@@ -16,6 +16,7 @@ export class AuthController {
     ) {}
 
     @Public()
+    @HttpCode(200)
     @Post('login')
     async login(@Body() body: LoginUserDto) {
         const { email, password } = body;
