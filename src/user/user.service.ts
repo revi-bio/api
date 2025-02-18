@@ -19,10 +19,6 @@ export class UserService {
         return await this.userModel.findOne({ email });
     }
 
-    getFind() { return this.userModel.find };
-
-    getFindOne() { return this.userModel.findOne };
-
     async createUser(data: {
         displayName: string;
         email: string;
