@@ -6,6 +6,7 @@ import * as argon2 from 'argon2';
 import { sign, verify } from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 import { Public } from './public.decorator';
+import { JwtData } from 'src/types/JwtData';
 
 @Controller('auth')
 export class AuthController {
@@ -27,12 +28,12 @@ export class AuthController {
             throw new HttpException('no such username or password', HttpStatus.FORBIDDEN);
         }
         
+        // passwords don't match
         if (!argon2.verify(dbUser.password, password)) {
-            // passwords don't match
             throw new HttpException('no such username or password', HttpStatus.FORBIDDEN);
         }
 
-        const jwtPayload = {
+        const jwtPayload: JwtData = {
             id: dbUser._id,
         };
 
@@ -55,6 +56,5 @@ export class AuthController {
         });
 
         return this.login({ email, password });
-        // TODO: call login action when register finishes, return JWT
     }
 }
