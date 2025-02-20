@@ -6,20 +6,20 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { secureHeapUsed } from 'crypto';
 import configuration from 'src/configuration';
-import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
     UserModule,
     PassportModule,
     JwtModule.register({
+      global: true,
       secret: configuration().jwtSecret,
       signOptions: {
         expiresIn: '2d',
       }
     })
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService],
   controllers: [AuthController]
 })
 export class AuthModule {}
