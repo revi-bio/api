@@ -3,12 +3,17 @@ import { HydratedDocument, Types } from "mongoose";
 
 export type SettingContainerDocument = HydratedDocument<SettingContainer>;
 
+export type Settings = {
+    'preferences.something': number,
+}
+
 @Schema({ timestamps: true })
 export class SettingContainer {
     /** Managed automatically by mongoose; the ID of the SettingContainer */
     _id: Types.ObjectId;
 
-
+    @Prop({ required: true, type: Object, default: {} })
+    settings: Settings;
 
     /**
      * The property we have for helping database migrations.
