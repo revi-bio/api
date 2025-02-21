@@ -1,4 +1,4 @@
-import { Body, Controller, HttpException, HttpStatus, Post, HttpCode } from '@nestjs/common';
+import { Body, Controller, HttpException, HttpStatus, Post, HttpCode, NotFoundException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
 import { LoginUserDto, RegisterUserDto } from './auth.validation';
@@ -25,12 +25,12 @@ export class AuthController {
         const dbUser = await this.userService.findByEmail(email);
 
         if (!dbUser) {
-            throw new HttpException('no such username or password', HttpStatus.FORBIDDEN);
+            throw new NotFoundException('no such username or password');
         }
         
         // passwords don't match
         if (!argon2.verify(dbUser.password, password)) {
-            throw new HttpException('no such username or password', HttpStatus.FORBIDDEN);
+            throw new NotFoundException('no such username or password');
         }
 
         const jwtPayload: JwtData = {
