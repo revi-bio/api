@@ -23,12 +23,12 @@ export class JwtAuthGuard implements CanActivate {
     if (isPublic) {
       return true;
     }
-
+    
     // route is not public, needs authentication, 
     // we have to check jwt
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
-
+    
     if (!token) {
       throw new UnauthorizedException();
     }
@@ -47,7 +47,7 @@ export class JwtAuthGuard implements CanActivate {
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.get('Authorization')?.split(' ') ?? [];
+    const [type, token] = request.headers['authorization']?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
   }
 
