@@ -4,12 +4,17 @@ import { User, UserDocument } from 'src/types/schema/User';
 import * as argon2 from 'argon2';
 import { InjectModel } from '@nestjs/mongoose';
 import { Collections } from 'src/types/Collections';
+import { JwtData } from 'src/types/JwtData';
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectModel(Collections.User) private readonly userModel: Model<User>,
     ) {}
+
+    async fromJwtData(jwtData: JwtData) {
+        return await this.findById(jwtData.id);
+    }
 
     async findById(id: Types.ObjectId): Promise<UserDocument | undefined> {
         return await this.userModel.findById(id);
