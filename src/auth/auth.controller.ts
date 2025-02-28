@@ -7,6 +7,7 @@ import { sign, verify } from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 import { Public } from './public.decorator';
 import { JwtData } from 'src/types/JwtData';
+import { SettingService } from 'src/setting/setting.service';
 
 @Controller('auth')
 export class AuthController {
@@ -14,6 +15,7 @@ export class AuthController {
         private readonly authService: AuthService,
         private readonly userService: UserService,
         private readonly configService: ConfigService,
+        private readonly settingService: SettingService,
     ) {}
 
     @Public()
@@ -49,11 +51,13 @@ export class AuthController {
     async register(@Body() body: RegisterUserDto) {
         const { displayName, email, password } = body;
 
-        await this.userService.createUser({
+        const dbUser = await this.userService.createUser({
             displayName,
             email,
             password,
         });
+
+        await this.settingService.initSettings(dbUser);
 
         return this.login({ email, password });
     }
