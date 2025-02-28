@@ -5,6 +5,7 @@ import { UserModule } from 'src/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { secureHeapUsed } from 'crypto';
 import configuration from 'src/configuration';
+import { SettingModule } from 'src/setting/setting.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import configuration from 'src/configuration';
       signOptions: {
         expiresIn: '2d',
       }
-    })
+    }),
+    SettingModule,
   ],
   providers: [AuthService],
   controllers: [AuthController]
