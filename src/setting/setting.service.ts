@@ -11,7 +11,7 @@ export class SettingService {
         @InjectModel(Collections.Setting) private readonly settingContainerModel: Model<SettingContainer>,
     ) {}
 
-    public async initSettings(user: User) {
+    async initSettings(user: User) {
         const dbSettingContainer = new this.settingContainerModel({
             settings: {},
             user,
@@ -20,12 +20,12 @@ export class SettingService {
         await dbSettingContainer.save();
     }
 
-    public async getSettings(user: User): Promise<Settings> {
+    async getSettings(user: User): Promise<Settings> {
         const dbSettingContainer = await this.settingContainerModel.findOne({ user })
         return dbSettingContainer.settings;
     }
 
-    public async setSettings(user: User, settings: Settings) {
+    async setSettings(user: User, settings: Settings) {
         const dbSettingContainer = await this.settingContainerModel.findOne({ user })
 
         for (let key in settings) {

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CurrentUser } from './user.decorator';
 import { JwtData } from 'src/types/JwtData';
@@ -10,7 +10,7 @@ export class UserController {
     ) {}
 
     @Get('@me')
-    public async selfInfo(@CurrentUser() currentUser: JwtData) {
+    async selfInfo(@CurrentUser() currentUser: JwtData) {
         const dbUser = await this.userService.findById(currentUser.id);
         const { _id, _schemaVersion, password, ...data } = dbUser.toJSON();
 
@@ -18,7 +18,5 @@ export class UserController {
     }
 
     @Get(':username')
-    public async getInfo() {
-
-    }
+    async getInfo() {}
 }
