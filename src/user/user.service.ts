@@ -8,7 +8,7 @@ import { Collections } from 'src/types/Collections';
 @Injectable()
 export class UserService {
     constructor(
-        @InjectModel(Collections.Users) private readonly userModel: Model<User>,
+        @InjectModel(Collections.User) private readonly userModel: Model<User>,
     ) {}
 
     async findById(id: Types.ObjectId): Promise<UserDocument | undefined> {

@@ -7,7 +7,7 @@ import { Collections } from 'src/types/Collections';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Collections.Users, schema: UserSchema }])
+    MongooseModule.forFeature([{ name: Collections.User, schema: UserSchema }])
   ],
   providers: [UserService],
   controllers: [UserController],
