@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Types } from "mongoose";
+import { SettingContainer } from "./SettingContainer";
+import { Collections } from "../Collections";
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -16,6 +18,9 @@ export class User {
 
     @Prop({ required: true })
     password: string;
+
+    @Prop({ type: Types.ObjectId, ref: Collections.Setting })
+    settingContainer: SettingContainer;
 
     /**
      * The property we have for helping database migrations.
