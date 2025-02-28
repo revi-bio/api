@@ -2,11 +2,14 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Types } from "mongoose";
 import { User } from "./User";
 import { Collections } from "../Collections";
+import { IsNumber, IsOptional } from "class-validator";
 
 export type SettingContainerDocument = HydratedDocument<SettingContainer>;
 
-export type Settings = {
-    'preferences.something': number,
+export class Settings {
+    @IsNumber()
+    @IsOptional()
+    'preferences.something': number = 0;
 }
 
 @Schema({ timestamps: true })
