@@ -1,12 +1,5 @@
 import { IsAlphanumeric, IsEmail, IsString, IsStrongPassword, Length, MaxLength } from "class-validator";
 
-export class EmailChangeDto {
-    @IsString()
-    @IsEmail()
-    @Length(5, 64)
-    email: string;
-}
-
 export class ChangeDisplayNameDto {
     @IsString()
     @IsEmail()
@@ -15,7 +8,20 @@ export class ChangeDisplayNameDto {
     displayName: string;
 }
 
+export class EmailChangeDto {
+    @IsString()
+    currentPassword: string;
+
+    @IsString()
+    @IsEmail()
+    @Length(5, 64)
+    email: string;
+}
+
 export class ChangePasswordDto {
+    @IsString()
+    currentPassword: string;
+
     @IsString()
     @MaxLength(64)
     @IsStrongPassword({
