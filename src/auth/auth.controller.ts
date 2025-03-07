@@ -31,7 +31,7 @@ export class AuthController {
         }
         
         // passwords don't match
-        if (!argon2.verify(dbUser.password, password)) {
+        if (!await argon2.verify(dbUser.password, password)) {
             throw new NotFoundException('no such username or password');
         }
 
