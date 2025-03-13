@@ -33,6 +33,7 @@
     "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.0",
+    "multer-gridfs-storage": "^5.0.2",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1"
   },
@@ -43,6 +44,7 @@
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.2",
     "@types/multer": "^1.4.12",
+    "@types/multer-gridfs-storage": "^5.0.0",
     "@types/node": "^20.3.1",
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.0",
