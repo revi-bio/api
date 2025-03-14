@@ -7,6 +7,7 @@ import configuration from 'src/configuration';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { AuthModule } from 'src/auth/auth.module';
+import { FileModule } from 'src/file/file.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AuthModule } from 'src/auth/auth.module';
       load: [configuration],
     }),
     AuthModule,
+    FileModule,
   ],
   controllers: [AppController],
   providers: [

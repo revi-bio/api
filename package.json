@@ -32,6 +32,7 @@
     "class-validator": "^0.14.1",
     "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "6.13.1",
     "mongoose": "^8.8.0",
     "multer-gridfs-storage": "^5.0.2",
     "reflect-metadata": "^0.2.0",
