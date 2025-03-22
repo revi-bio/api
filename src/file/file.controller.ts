@@ -1,15 +1,19 @@
-import { Controller, Get, Param } from "@nestjs/common";
+import { Controller, Get, Param, StreamableFile, Res } from "@nestjs/common";
 import { Public } from "src/auth/public.decorator";
 import { FileService } from "./file.service";
+import { ObjectId } from 'mongodb';
 
 @Controller('file')
 export class FileController {
-    
-    constructor(private readonly fileService: FileService) {}
+
+    constructor(private readonly fileService: FileService) { }
 
     @Public()
     @Get(':id')
     async getFile(@Param('id') id: string) {
-        return 
+        const objid = new ObjectId(id);
+        const fileStream = await this.fileService.streamFile(objid);
+        const fileData = await this.fileService.getFile(objid);
+        return new StreamableFile(fileStream, { type: fileData.metadata.contentType });
     }
 }

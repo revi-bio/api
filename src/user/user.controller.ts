@@ -1,7 +1,9 @@
-import { Body, Controller, ForbiddenException, Get, Patch, Post, UnauthorizedException } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Patch, Post, UnauthorizedException, UploadedFile, ImATeapotException, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
 import { CurrentUser } from './user.decorator';
 import { JwtData } from 'src/types/JwtData';
+import { FileService } from 'src/file/file.service';
 import { ChangeDisplayNameDto, ChangePasswordDto, EmailChangeDto } from './user.validation';
 import * as argon2 from 'argon2';
 
@@ -9,7 +11,8 @@ import * as argon2 from 'argon2';
 export class UserController {
     constructor(
         private readonly userService: UserService,
-    ) {}
+        private readonly fileService: FileService,
+    ) { }
 
     @Get('@me')
     async selfInfo(@CurrentUser() currentUser: JwtData) {
@@ -20,8 +23,8 @@ export class UserController {
     }
 
     @Get(':username')
-    async getInfo() {}
-    
+    async getInfo() { }
+
     @Patch('change-email')
     async changeEmail(@Body() body: EmailChangeDto, @CurrentUser() currentUser: JwtData) {
         const dbUser = await this.userService.fromJwtData(currentUser);
@@ -50,5 +53,14 @@ export class UserController {
         dbUser.displayName = body.displayName;
 
         await dbUser.save();
+    }
+
+    @Patch('avatar')
+    @UseInterceptors(FileInterceptor('file'))
+    async changeAvatar(@UploadedFile() file: Express.Multer.File, @CurrentUser() user: JwtData) {
+        console.log(file);
+        if (!file) throw new ImATeapotException();
+        const dbFile = await this.fileService.uploadFile(file, { ass: 'ass' });
+        console.log(dbFile);
     }
 }
