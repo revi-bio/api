@@ -2,7 +2,6 @@ import { IsAlphanumeric, IsEmail, IsString, IsStrongPassword, Length, MaxLength 
 
 export class ChangeDisplayNameDto {
     @IsString()
-    @IsEmail()
     @IsAlphanumeric()
     @Length(1, 32)
     displayName: string;
