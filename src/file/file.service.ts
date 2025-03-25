@@ -16,10 +16,12 @@ export class FileService {
     this.gridFsBucket = new GridFSBucket(this.connection.db);
   }
 
-  async uploadFile(file: Express.Multer.File, options: any) {
+  async uploadFile(file: Express.Multer.File, type: string, identifier?: string) {
     const uploadStream = this.gridFsBucket.openUploadStream(file.originalname, {
       metadata: {
         contentType: file.mimetype,
+        identifier,
+        type,
       },
     });
 
@@ -30,8 +32,13 @@ export class FileService {
     });
   }
 
-  async getFile(id: ObjectId) {
+  async getFileByObjectId(id: ObjectId) {
     const file = this.gridFsBucket.find({ _id: id });
+    return await file.next();
+  }
+
+  async getFileByIdentifier(identifier: string) {
+    const file = this.gridFsBucket.find({ 'metadata.identifier': identifier });
     return await file.next();
   }
 
