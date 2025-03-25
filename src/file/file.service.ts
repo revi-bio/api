@@ -2,13 +2,11 @@ import { Injectable, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
-import { GridFsStorage } from 'multer-gridfs-storage/lib/gridfs';
 import { GridFSBucket } from 'mongodb';
 import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class FileService {
-  private gridFsStorage: GridFsStorage;
   private gridFsBucket: GridFSBucket;
 
   constructor(
@@ -16,25 +14,6 @@ export class FileService {
     @InjectConnection() private readonly connection: Connection,
   ) {
     this.gridFsBucket = new GridFSBucket(this.connection.db);
-    /*
-    this.gridFsStorage = new GridFsStorage({
-      db: connection.db as any,
-      file: async (req, file) => {
-        const filename = file.originalname.trim();
-        const fileInfo = {
-          filename: filename,
-        };
-
-        return fileInfo;
-      },
-    });
-    */
-  }
-
-  createMulterOptions() {
-    return {
-      storage: this.gridFsStorage,
-    };
   }
 
   async uploadFile(file: Express.Multer.File, options: any) {
