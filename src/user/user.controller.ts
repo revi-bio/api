@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Get, Patch, Post, UnauthorizedException, UploadedFile, ImATeapotException, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Patch, Post, UnauthorizedException, UploadedFile, ImATeapotException, UseInterceptors, Delete } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
 import { CurrentUser } from './user.decorator';
@@ -59,10 +59,20 @@ export class UserController {
     @UseInterceptors(FileInterceptor('file'))
     async changeAvatar(@UploadedFile() file: Express.Multer.File, @CurrentUser() currentUser: JwtData) {
         if (!file) throw new ImATeapotException();
-        const dbFile = await this.fileService.uploadFile(file, 'avatar');
 
+        const dbFile = await this.fileService.uploadFile(file, 'avatar');
         const dbUser = await this.userService.fromJwtData(currentUser);
         dbUser.avatar = dbFile;
+        await dbUser.save();
+
+        return dbFile;
+    }
+
+    @Delete('avatar')
+    async deleteAvatar(@CurrentUser() currentUser: JwtData) {
+        const dbUser = await this.userService.fromJwtData(currentUser);
+        dbUser.avatar = undefined;
+
         await dbUser.save();
     }
 }
