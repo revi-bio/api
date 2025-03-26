@@ -13,7 +13,7 @@ export class FileController {
     async getFile(@Param('id') id: string) {
         const objid = new ObjectId(id);
         const fileStream = await this.fileService.streamFile(objid);
-        const fileData = await this.fileService.getFile(objid);
+        const fileData = await this.fileService.getFileByObjectId(objid);
         return new StreamableFile(fileStream, { type: fileData.metadata.contentType });
     }
 }
