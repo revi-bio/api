@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Types } from "mongoose";
 import { SettingContainer } from "./SettingContainer";
 import { Collections } from "../Collections";
+import { ObjectId } from "mongodb";
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -21,6 +22,9 @@ export class User {
 
     @Prop({ type: Types.ObjectId, ref: Collections.Setting })
     settingContainer: SettingContainer;
+
+    @Prop({ type: Types.ObjectId })
+    avatar: ObjectId;
 
     /**
      * The property we have for helping database migrations.

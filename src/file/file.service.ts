@@ -16,7 +16,7 @@ export class FileService {
     this.gridFsBucket = new GridFSBucket(this.connection.db);
   }
 
-  async uploadFile(file: Express.Multer.File, type: string, identifier?: string) {
+  async uploadFile(file: Express.Multer.File, type: string, identifier?: string): Promise<ObjectId> {
     const uploadStream = this.gridFsBucket.openUploadStream(file.originalname, {
       metadata: {
         contentType: file.mimetype,
@@ -25,7 +25,7 @@ export class FileService {
       },
     });
 
-    return await new Promise((resolve, reject) => {
+    return await new Promise<ObjectId>((resolve, reject) => {
       uploadStream.end(file.buffer, () => {
         resolve(uploadStream.id);
       });

@@ -57,10 +57,12 @@ export class UserController {
 
     @Patch('avatar')
     @UseInterceptors(FileInterceptor('file'))
-    async changeAvatar(@UploadedFile() file: Express.Multer.File, @CurrentUser() user: JwtData) {
-        console.log(file);
+    async changeAvatar(@UploadedFile() file: Express.Multer.File, @CurrentUser() currentUser: JwtData) {
         if (!file) throw new ImATeapotException();
         const dbFile = await this.fileService.uploadFile(file, 'avatar');
-        console.log(dbFile);
+
+        const dbUser = await this.userService.fromJwtData(currentUser);
+        dbUser.avatar = dbFile;
+        await dbUser.save();
     }
 }
