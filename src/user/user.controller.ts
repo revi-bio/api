@@ -25,7 +25,7 @@ export class UserController {
     @Get(':username')
     async getInfo() { }
 
-    @Patch('change-email')
+    @Patch('email')
     async changeEmail(@Body() body: EmailChangeDto, @CurrentUser() currentUser: JwtData) {
         const dbUser = await this.userService.fromJwtData(currentUser);
         if (!await argon2.verify(dbUser.password, body.currentPassword))
@@ -36,7 +36,7 @@ export class UserController {
         await dbUser.save();
     }
 
-    @Patch('change-password')
+    @Patch('password')
     async changePassword(@Body() body: ChangePasswordDto, @CurrentUser() currentUser: JwtData) {
         const dbUser = await this.userService.fromJwtData(currentUser);
         if (!await argon2.verify(dbUser.password, body.currentPassword))
@@ -47,7 +47,7 @@ export class UserController {
         await dbUser.save();
     }
 
-    @Patch('change-displayname')
+    @Patch('displayname')
     async changeDisplayName(@Body() body: ChangeDisplayNameDto, @CurrentUser() currentUser: JwtData) {
         const dbUser = await this.userService.fromJwtData(currentUser);
         dbUser.displayName = body.displayName;
