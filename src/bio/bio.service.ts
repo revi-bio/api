@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Collections } from 'src/types/Collections';
 import { Bio, BioDocument } from 'src/types/schema/Bio';
 import { User } from 'src/types/schema/User';
@@ -10,6 +10,14 @@ export class BioService {
   constructor(
     @InjectModel(Collections.Bio) private readonly bioModel: Model<Bio>,
   ) { }
+
+  async findById(id: Types.ObjectId) {
+    return await this.bioModel.findById(id);
+  }
+
+  async findByHandle(handle: string) {
+    return await this.bioModel.findOne({ handle });
+  }
 
   async createBio(data: {
     handle: string,
