@@ -8,6 +8,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { AuthModule } from 'src/auth/auth.module';
 import { FileModule } from 'src/file/file.module';
+import { BioModule } from 'src/bio/bio.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { FileModule } from 'src/file/file.module';
     }),
     AuthModule,
     FileModule,
+    BioModule,
   ],
   controllers: [AppController],
   providers: [
@@ -34,4 +36,4 @@ import { FileModule } from 'src/file/file.module';
     }
   ],
 })
-export class AppModule {}
+export class AppModule { }
