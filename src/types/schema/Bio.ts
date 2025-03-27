@@ -11,10 +11,17 @@ export class Bio {
     /** Managed automatically by mongoose; the ID of the SettingContainer */
     _id: Types.ObjectId;
 
+    @Prop({ required: true, index: { unique: true } })
+    handle: string;
+
+    //  INFO: subject to change, we might just yank this data out from the profile widget later
+    @Prop({ required: true })
+    name: string;
+
     @Prop({ required: true, type: [Object], default: [] })
+    widgets: object[];
 
-
-    @Prop({ type: Types.ObjectId, ref: Collections.User })
+    @Prop({ required: true, type: Types.ObjectId, ref: Collections.User })
     user: User;
 
     /**
