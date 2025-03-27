@@ -1,8 +1,9 @@
-import { Controller, Delete, Get, NotFoundException, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post } from '@nestjs/common';
 import { BioService } from './bio.service';
 import { CurrentUser } from 'src/user/user.decorator';
 import { UserService } from 'src/user/user.service';
 import { JwtData } from 'src/types/JwtData';
+import { CreateBioDto } from './bio.validation';
 
 @Controller('bio')
 export class BioController {
@@ -30,8 +31,18 @@ export class BioController {
   }
 
   @Post()
-  async createBio() {
+  async createBio(@Body() body: CreateBioDto, @CurrentUser() currentUser: JwtData) {
+    const { name, handle } = body;
 
+    const dbUser = await this.userService.fromJwtData(currentUser);
+
+    const dbBio = await this.bioService.createBio({
+      name,
+      handle,
+      user: dbUser,
+    });
+
+    return dbBio.toJSON();
   }
 
   @Patch()
