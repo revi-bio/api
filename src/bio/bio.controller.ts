@@ -1,7 +1,6 @@
-import { Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { Controller, Delete, Get, NotFoundException, Param, Patch, Post } from '@nestjs/common';
 import { BioService } from './bio.service';
 import { CurrentUser } from 'src/user/user.decorator';
-import { JwtPayload } from 'jsonwebtoken';
 import { UserService } from 'src/user/user.service';
 import { JwtData } from 'src/types/JwtData';
 
@@ -19,9 +18,13 @@ export class BioController {
   }
 
   @Get(':handle')
-  async getBio(@Param('handle') handle, @CurrentUser() currentUser: JwtPayload) {
-    const dbUser = await this.bioService.findByHandle(handle);
-    const { _id, _schemaVersion, ...data } = dbUser.toJSON();
+  async getBio(@Param('handle') handle, @CurrentUser() currentUser: JwtData) {
+    const dbBio = await this.bioService.findByHandle(handle);
+
+    if (!dbBio)
+      throw new NotFoundException();
+
+    const { _id, _schemaVersion, ...data } = dbBio.toJSON();
 
     return data;
   }
