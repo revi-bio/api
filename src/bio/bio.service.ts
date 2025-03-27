@@ -19,6 +19,10 @@ export class BioService {
     return await this.bioModel.findOne({ handle });
   }
 
+  async findByUser(user: User): Promise<BioDocument[]> {
+    return await this.bioModel.find({ user });
+  }
+
   async createBio(data: {
     handle: string,
     name: string,
