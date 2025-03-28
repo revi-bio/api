@@ -17,7 +17,7 @@ export class UserController {
     @Get('@me')
     async selfInfo(@CurrentUser() currentUser: JwtData) {
         const dbUser = await this.userService.findById(currentUser.id);
-        const { _id, _schemaVersion, password, ...data } = dbUser.toJSON();
+        const { _id, _schemaVersion, __v, password, ...data } = dbUser.toJSON();
 
         return data;
     }
