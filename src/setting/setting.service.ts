@@ -9,11 +9,10 @@ import { User } from 'src/types/schema/User';
 export class SettingService {
     constructor(
         @InjectModel(Collections.Setting) private readonly settingContainerModel: Model<SettingContainer>,
-    ) {}
+    ) { }
 
     async initSettings(user: User) {
         const dbSettingContainer = new this.settingContainerModel({
-            settings: {},
             user,
         });
 
@@ -21,17 +20,18 @@ export class SettingService {
     }
 
     async getSettings(user: User): Promise<Settings> {
-        const dbSettingContainer = await this.settingContainerModel.findOne({ user })
+        const dbSettingContainer = await this.settingContainerModel.findOne({ user: user._id })
         return dbSettingContainer.settings;
     }
 
     async setSettings(user: User, settings: Settings) {
-        const dbSettingContainer = await this.settingContainerModel.findOne({ user })
+        const dbSettingContainer = await this.settingContainerModel.findOne({ user: user._id })
 
         for (let key in settings) {
             dbSettingContainer.settings[key] = settings[key];
         }
 
+        dbSettingContainer.markModified('settings');
         await dbSettingContainer.save();
     }
 }

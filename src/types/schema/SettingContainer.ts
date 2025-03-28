@@ -2,17 +2,18 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Types } from "mongoose";
 import { User } from "./User";
 import { Collections } from "../Collections";
-import { IsNumber, IsOptional } from "class-validator";
+import { IsIn, IsNumber, IsOptional, IsString } from "class-validator";
 
 export type SettingContainerDocument = HydratedDocument<SettingContainer>;
 
 export class Settings {
-    @IsNumber()
+    @IsString()
+    @IsIn(['he/him', 'she/her', 'they/them', 'cheese/cheddar'])
     @IsOptional()
-    'preferences.something': number = 0;
+    'preferences.pronouns': string = 'cheese/cheddar';
 }
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, minimize: false })
 export class SettingContainer {
     /** Managed automatically by mongoose; the ID of the SettingContainer */
     _id: Types.ObjectId;
