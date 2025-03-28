@@ -15,7 +15,15 @@ export class BioController {
   @Get()
   async getBios(@CurrentUser() currentUser: JwtData) {
     const dbUser = await this.userService.fromJwtData(currentUser);
-    return await this.bioService.findByUser(dbUser);
+    const dbBioList = await this.bioService.findByUser(dbUser);
+
+    const formattedData = dbBioList.map(bio => {
+      const { _id, _schemaVersion, __v, ...data } = bio.toJSON();
+
+      return { ...data, views: 0, widgets: 99 };
+    });
+
+    return formattedData;
   }
 
   @Get(':handle')
@@ -25,9 +33,9 @@ export class BioController {
     if (!dbBio)
       throw new NotFoundException();
 
-    const { _id, _schemaVersion, ...data } = dbBio.toJSON();
+    const { _id, _schemaVersion, __v, ...data } = dbBio.toJSON();
 
-    return data;
+    return { ...data, views: 0, widgets: 99 };
   }
 
   @Post()
