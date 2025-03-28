@@ -19,7 +19,7 @@ export class BioController {
   }
 
   @Get(':handle')
-  async getBio(@Param('handle') handle, @CurrentUser() currentUser: JwtData) {
+  async getBio(@Param('handle') handle: string, @CurrentUser() currentUser: JwtData) {
     const dbBio = await this.bioService.findByHandle(handle);
 
     if (!dbBio)
@@ -47,11 +47,16 @@ export class BioController {
 
   @Patch()
   async editBio() {
-
+    // TODO: make
   }
 
-  @Delete()
-  async deleteBio() {
+  @Delete(':handle')
+  async deleteBio(@Param('handle') handle: string) {
+    const dbBio = await this.bioService.findByHandle(handle);
 
+    if (!dbBio)
+      throw new NotFoundException();
+
+    await dbBio.deleteOne();
   }
 }
