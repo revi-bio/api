@@ -50,7 +50,7 @@ export class BioController {
       user: dbUser,
     });
 
-    return dbBio.toJSON();
+    return dbBio.depopulate('user').toJSON();
   }
 
   @Patch()
