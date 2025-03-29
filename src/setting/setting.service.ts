@@ -21,7 +21,15 @@ export class SettingService {
 
     async getSettings(user: User): Promise<Settings> {
         const dbSettingContainer = await this.settingContainerModel.findOne({ user: user._id })
-        return dbSettingContainer.settings;
+        // initializing default settings with this
+        const settings = new Settings();
+        const userSettingOverrides = dbSettingContainer.settings;
+
+        for (let key in userSettingOverrides) {
+            settings[key] = userSettingOverrides[key];
+        }
+
+        return settings;
     }
 
     async setSettings(user: User, settings: Settings) {
