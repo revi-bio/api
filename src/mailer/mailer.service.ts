@@ -5,6 +5,7 @@ import { sendEmailDto } from './mailer.interface';
 import Mail from 'nodemailer/lib/mailer';
 import configuration from 'src/configuration';
 
+
 @Injectable()
 export class MailerService {
 
@@ -15,8 +16,9 @@ export class MailerService {
             service:'gmail',
             secure: true,
             auth: {
-                user: configuration().mail_user,
-                pass: configuration().mail_password
+                
+                user: this.configService.get<string>('mailUser'),
+                pass: this.configService.get<string>('mailPassword')
             }
         });
 
