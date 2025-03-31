@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
-import { sendEmailDto } from './mailer.interface';
+import { SendEmailDto } from './mailer.interface';
 import Mail from 'nodemailer/lib/mailer';
 
 @Injectable()
@@ -23,7 +23,7 @@ export class MailerService {
     return html.replace(/{(\w*)}/g, (m, key) => replacements[key] ?? '');
   }
 
-  async sendEmail(dto: sendEmailDto) {
+  async sendEmail(dto: SendEmailDto) {
     const { from, recepients, subject } = dto;
     const html =
       dto.placeholderReplacements ? this.template(dto.html, dto.placeholderReplacements) : dto.html;

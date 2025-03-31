@@ -1,6 +1,6 @@
 import { Address } from "nodemailer/lib/mailer"
 
-export type sendEmailDto = {
+export type SendEmailDto = {
     from?: Address,
     recepients: Address[],
     subject: string,
