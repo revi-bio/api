@@ -6,11 +6,10 @@ import Mail from 'nodemailer/lib/mailer';
 
 @Injectable()
 export class MailerService {
-  constructor(private readonly configService: ConfigService) {}
+  private transporter: nodemailer.Transporter;
 
-
-  transportMail() {
-    const transporter = nodemailer.createTransport({
+  constructor(private readonly configService: ConfigService) {
+    this.transporter = nodemailer.createTransport({
       service: 'gmail',
       secure: true,
       auth: {
@@ -18,25 +17,16 @@ export class MailerService {
         pass: this.configService.get<string>('mailPassword'),
       },
     });
-
-    return transporter;
   }
 
-
   template(html: string, replacements: Record<string, string>) {
-    return html.replace(
-      /{(\w*)}/g,
-      function (m, key) {
-        return replacements.hasOwnProperty(key) ? replacements[key] : '';
-      },
-    );
+    return html.replace(/{(\w*)}/g, (m, key) => replacements[key] ?? '');
   }
 
   async sendEmail(dto: sendEmailDto) {
     const { from, recepients, subject } = dto;
     const html =
       dto.placeholderReplacements ? this.template(dto.html, dto.placeholderReplacements) : dto.html;
-    const transport = this.transportMail();
 
     const options: Mail.Options = {
       from: from ?? {
@@ -49,21 +39,20 @@ export class MailerService {
     };
 
     try {
-      const result = await transport.sendMail(options);
+      const result = await this.transporter.sendMail(options);
       return result;
     } catch (error) {
       console.log('Nodemailer error:', error);
-      throw new Error('Failed to send email'); 
+      throw new Error('Failed to send email');
     }
   }
 
-  /* How to use later on:
-    #1. Import the MailerService to the service you want to use it with
-    #2. Set parameters for the email, these will be used in the email
-    #3. Define a DTO with the necessary fields
-    #4. Pass the DTO as the parameter to the sendEmail method of the MailerService
+    /* Usage Example:
+    #1. Import MailerService to the desired service.
+    #2. Define the DTO with required fields.
+    #3. Pass the DTO to sendEmail method.
 
-    Here's an example:
+    Example Usage:
 
     import { Injectable } from '@nestjs/common';
     import { MailerService } from 'src/mailer/mailer.service';
@@ -78,12 +67,14 @@ export class MailerService {
           recepients: [{ name: userName, address: userEmail }],
           subject: 'Setting Update Notification',
           html: `<p>Dear {userName}, {userEmail} your settings have been updated successfully!</p>`,
-          placeholderReplacements: { userName, address: userEmail }
+          placeholderReplacements: { userName, userEmail }
         };
 
         return await this.mailerService.sendEmail(dto);
       }
     }
-
   */
+
 }
+
+
