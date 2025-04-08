@@ -1,15 +1,18 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post,ImATeapotException,UseInterceptors } from '@nestjs/common';
 import { BioService } from './bio.service';
 import { CurrentUser } from 'src/user/user.decorator';
 import { UserService } from 'src/user/user.service';
 import { JwtData } from 'src/types/JwtData';
 import { CreateBioDto } from './bio.validation';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FileService } from 'src/file/file.service';
 
 @Controller('bio')
 export class BioController {
   constructor(
     private readonly bioService: BioService,
     private readonly userService: UserService,
+    private readonly fileService: FileService
   ) { }
 
   @Get()
@@ -56,6 +59,27 @@ export class BioController {
   @Patch()
   async editBio() {
     // TODO: make
+  }
+
+  @Patch('bioPfp')
+  @UseInterceptors(FileInterceptor('file'))
+  async changePfp(@UseInterceptors(FileInterceptor('file')) file: Express.Multer.File, @CurrentUser() CurrentUser: JwtData){
+    if (!file) throw new ImATeapotException();
+
+    const dbFile = await this.fileService.uploadFile(file, 'bioPfp');
+    const dbUser = await this.userService.fromJwtData(CurrentUser);
+    dbUser.bioPfp = dbFile;
+    await dbUser.save();
+
+    return dbFile;
+  }
+
+  @Delete('bioPfp')
+  async deleteBioPfp(@CurrentUser() currentUser: JwtData){
+    const dbUser = await this.userService.fromJwtData(currentUser);
+    dbUser.bioPfp = undefined;
+
+    await dbUser.save();
   }
 
   @Delete(':handle')
