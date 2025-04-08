@@ -73,7 +73,7 @@ export class BioController {
 
     const dbFile = await this.fileService.uploadFile(file, 'bioPfp');
 
-    dbBio.avatar = dbFile.path;
+    dbBio.avatar = dbFile;
     
     await dbBio.save();
 
