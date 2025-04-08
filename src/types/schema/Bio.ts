@@ -3,6 +3,7 @@ import { HydratedDocument, Types } from "mongoose";
 import { User } from "./User";
 import { Collections } from "../Collections";
 import { IsNumber, IsOptional } from "class-validator";
+import { ObjectId } from "mongodb";
 
 export type BioDocument = HydratedDocument<Bio>;
 
@@ -23,6 +24,9 @@ export class Bio {
 
     @Prop({ required: true, type: Types.ObjectId, ref: Collections.User })
     user: User;
+
+    @Prop({ type: Types.ObjectId })
+    avatar: ObjectId;
 
     /**
      * The property we have for helping database migrations.

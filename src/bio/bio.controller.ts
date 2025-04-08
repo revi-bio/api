@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post,ImATeapotException,UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post,ImATeapotException,UseInterceptors, UploadedFile } from '@nestjs/common';
 import { BioService } from './bio.service';
 import { CurrentUser } from 'src/user/user.decorator';
 import { UserService } from 'src/user/user.service';
@@ -61,25 +61,33 @@ export class BioController {
     // TODO: make
   }
 
-  @Patch('bioPfp')
+  @Patch(':handle/bioPfp')
   @UseInterceptors(FileInterceptor('file'))
-  async changePfp(@UseInterceptors(FileInterceptor('file')) file: Express.Multer.File, @CurrentUser() CurrentUser: JwtData){
+  async changePfp(@Param('handle') handle: string, @UploadedFile() file: Express.Multer.File, @CurrentUser() CurrentUser: JwtData){
+    const dbBio = await this.bioService.findByHandle(handle);
+
+    if (!dbBio)
+      throw new NotFoundException();
+
     if (!file) throw new ImATeapotException();
 
     const dbFile = await this.fileService.uploadFile(file, 'bioPfp');
-    const dbUser = await this.userService.fromJwtData(CurrentUser);
-    dbUser.bioPfp = dbFile;
-    await dbUser.save();
+
+    await dbBio.save();
 
     return dbFile;
   }
 
-  @Delete('bioPfp')
-  async deleteBioPfp(@CurrentUser() currentUser: JwtData){
-    const dbUser = await this.userService.fromJwtData(currentUser);
-    dbUser.bioPfp = undefined;
+  @Delete(':handle/bioPfp')
+  async deleteBioPfp(@Param('handle') handle: string, @CurrentUser() currentUser: JwtData){
+    const dbBio = await this.bioService.findByHandle(handle);
 
-    await dbUser.save();
+    if (!dbBio)
+      throw new NotFoundException();
+
+    dbBio.avatar = undefined;
+
+    await dbBio.save();
   }
 
   @Delete(':handle')
