@@ -3,7 +3,7 @@ import { BioService } from './bio.service';
 import { CurrentUser } from 'src/user/user.decorator';
 import { UserService } from 'src/user/user.service';
 import { JwtData } from 'src/types/JwtData';
-import { CreateBioDto } from './bio.validation';
+import { CreateBioDto, EditBioDto } from './bio.validation';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from 'src/file/file.service';
 
@@ -36,7 +36,7 @@ export class BioController {
     if (!dbBio)
       throw new NotFoundException();
 
-    const { _id, _schemaVersion, __v, ...data } = dbBio.toJSON();
+    const { _id, _schemaVersion, __v, ...data } = dbBio.depopulate('user').toJSON();
 
     return { ...data, views: 0, widgets: 99 };
   }
@@ -53,12 +53,29 @@ export class BioController {
       user: dbUser,
     });
 
-    return dbBio.depopulate('user').toJSON();
+    const { _id, _schemaVersion, __v, ...data } = dbBio.depopulate('user').toJSON();
+
+    return data;
   }
 
-  @Patch()
-  async editBio() {
+  @Patch(':handle')
+  async editBio(@Body() body: EditBioDto, @Param('handle') handle: string, @CurrentUser() currentUser: JwtData) {
     // TODO: make
+    const dbBio = await this.bioService.findByHandle(handle);
+
+    if (!dbBio)
+      throw new NotFoundException();
+
+    for (const key in body) {
+      dbBio[key] = body[key];
+    }
+
+    dbBio.markModified('widgets');
+    await dbBio.save();
+
+    const { _id, _schemaVersion, __v, ...data } = dbBio.depopulate('user').toJSON();
+
+    return data;
   }
 
   @Patch(':handle/bioPfp')
