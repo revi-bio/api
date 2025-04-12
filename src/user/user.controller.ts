@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Get, Patch, Post, UnauthorizedException, UploadedFile, ImATeapotException, UseInterceptors, Delete } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Patch, Post, UnauthorizedException, UploadedFile, ImATeapotException, UseInterceptors, Delete, Param, NotFoundException } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserService } from './user.service';
 import { CurrentUser } from './user.decorator';
@@ -24,6 +24,23 @@ export class UserController {
 
     @Get(':username')
     async getInfo() { }
+
+    @Get('verify-email/:emailVerification')
+    async verifyEmail(@Param('emailVerification') emailVerification: string) {
+        // Keresd meg a felhasználót az emailVerification alapján
+        const dbUser = await this.userService.findByEmailVerification(emailVerification);
+
+        if (!dbUser) {
+            throw new NotFoundException('Invalid email verification token');
+        }
+
+        // Töröld az emailVerification mezőt
+        dbUser.validations = dbUser.validations.filter(v => v.emailVerification !== emailVerification);
+
+        await dbUser.save();
+
+        return { message: 'Email verification successful' };
+    }
 
     @Patch('email')
     async changeEmail(@Body() body: EmailChangeDto, @CurrentUser() currentUser: JwtData) {
@@ -75,4 +92,6 @@ export class UserController {
 
         await dbUser.save();
     }
+
+    
 }

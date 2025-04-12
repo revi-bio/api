@@ -8,6 +8,9 @@ import { ConfigService } from '@nestjs/config';
 import { Public } from './public.decorator';
 import { JwtData } from 'src/types/JwtData';
 import { SettingService } from 'src/setting/setting.service';
+import { MailerService } from 'src/mailer/mailer.service';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 @Controller('auth')
 export class AuthController {
@@ -16,7 +19,9 @@ export class AuthController {
         private readonly userService: UserService,
         private readonly configService: ConfigService,
         private readonly settingService: SettingService,
+        private readonly mailerService: MailerService
     ) {}
+    
 
     @Public()
     @HttpCode(200)
@@ -33,6 +38,10 @@ export class AuthController {
         // passwords don't match
         if (!await argon2.verify(dbUser.password, password)) {
             throw new NotFoundException('no such username or password');
+        }
+
+        if(dbUser.validations.filter(v => v.emailVerification).length) {
+            throw new NotFoundException('unconfirmed email address');
         }
 
         const jwtPayload: JwtData = {
@@ -58,6 +67,16 @@ export class AuthController {
         });
 
         await this.settingService.initSettings(dbUser);
+        
+        const htmlTemplate = readFileSync(join(__dirname, '..', '..', 'assets', 'templates', 'verification.html'), 'utf8');
+
+        await this.mailerService.sendEmail({
+            from: { name: this.configService.get<string>('appName'), address: this.configService.get<string>('defMailFrom') },
+            recepients: [{ name: "user", address: email }],
+            subject: 'Welcome to our platform!',
+            html: htmlTemplate,
+            placeholderReplacements: {emailVerification: dbUser.validations[0].emailVerification},
+        });
 
         return this.login({ email, password });
     }

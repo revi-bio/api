@@ -5,6 +5,7 @@ import * as argon2 from 'argon2';
 import { InjectModel } from '@nestjs/mongoose';
 import { Collections } from 'src/types/Collections';
 import { JwtData } from 'src/types/JwtData';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UserService {
@@ -22,6 +23,10 @@ export class UserService {
 
     async findByEmail(email: string): Promise<UserDocument | undefined> {
         return await this.userModel.findOne({ email });
+    }
+
+    async findByEmailVerification(emailVerification: string): Promise<UserDocument | undefined> {
+        return this.userModel.findOne({ 'validations.emailVerification': emailVerification });
     }
 
     async createUser(data: {
@@ -45,6 +50,9 @@ export class UserService {
             // dangerous for us to store in plaintext. Argon2 is one of the best algorithms for
             // this task, so we use that.
             password: await argon2.hash(password),
+            validations: [
+                {emailVerification: uuidv4()},
+            ],
         });
 
         await dbUser.save();

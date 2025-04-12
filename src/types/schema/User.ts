@@ -36,6 +36,9 @@ export class User {
     @Prop({ required: true, default: 0 })
     _schemaVersion: number;
 
+    @Prop({default: [], type: [Object]})
+    validations?: {emailVerification?: string}[];
+
     /** Managed automatically by mongoose */
     createdAt: Date;
 

@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { secureHeapUsed } from 'crypto';
 import configuration from 'src/configuration';
 import { SettingModule } from 'src/setting/setting.module';
+import { MailerModule } from 'src/mailer/mailer.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { SettingModule } from 'src/setting/setting.module';
       }
     }),
     SettingModule,
+    MailerModule
   ],
   providers: [AuthService],
   controllers: [AuthController]
