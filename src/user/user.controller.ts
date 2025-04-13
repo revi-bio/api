@@ -27,14 +27,12 @@ export class UserController {
 
     @Get('verify-email/:emailVerification')
     async verifyEmail(@Param('emailVerification') emailVerification: string) {
-        // Keresd meg a felhasználót az emailVerification alapján
-        const dbUser = await this.userService.findByEmailVerification(emailVerification);
+        const dbUser = await this.userService.findByVerification('emailVerification', emailVerification);
 
         if (!dbUser) {
             throw new NotFoundException('Invalid email verification token');
         }
 
-        // Töröld az emailVerification mezőt
         dbUser.validations = dbUser.validations.filter(v => v.emailVerification !== emailVerification);
 
         await dbUser.save();

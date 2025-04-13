@@ -25,8 +25,9 @@ export class UserService {
         return await this.userModel.findOne({ email });
     }
 
-    async findByEmailVerification(emailVerification: string): Promise<UserDocument | undefined> {
-        return this.userModel.findOne({ 'validations.emailVerification': emailVerification });
+    async findByVerification(key: string, value: string): Promise<UserDocument | undefined> {
+        const findKey = `validations.${key}`;
+        return this.userModel.findOne({ [findKey]: value });
     }
 
     async createUser(data: {
