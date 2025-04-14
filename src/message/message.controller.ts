@@ -1,34 +1,34 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
 import { MessageService } from './message.service';
-import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
+import { UserService } from 'src/user/user.service';
+import { CreateMessageDto } from './message.validation';
+//import { UpdateMessageDto } from './message.validation';
+import { JwtData } from 'src/types/JwtData';
+import { CurrentUser } from 'src/user/user.decorator';
+import { Types } from 'mongoose';
 
 @Controller('message')
 export class MessageController {
-  constructor(private readonly messageService: MessageService) {}
+  constructor(
+    private readonly messageService: MessageService,
+    private readonly userService: UserService
+  ) {}
 
   @Post()
-  create(@Body() createMessageDto: CreateMessageDto) {
-    return this.messageService.create(createMessageDto);
-  }
+  async createMessage(@Body() body: CreateMessageDto) {
+    const { title, text, userId } = body;
+    const dbUser = await this.userService.findById(new Types.ObjectId(userId));
 
-  @Get()
-  findAll() {
-    return this.messageService.findAll();
-  }
+    if (!dbUser) {
+      throw new NotFoundException('User not found');
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.messageService.findOne(+id);
-  }
+    const dbMessage = await this.messageService.createMessage({
+      title,
+      text,
+      user: dbUser,
+    });
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMessageDto: UpdateMessageDto) {
-    return this.messageService.update(+id, updateMessageDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.messageService.remove(+id);
+    //const { _id, _schemaVersion, __v, ...data } = dbMessage.toObject();
   }
 }

@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Types } from "mongoose";
+import { Collections } from "../Collections";
+import { User } from "./User";
 
 export type MessageDocument = HydratedDocument<Message>;
 
@@ -14,8 +16,8 @@ export class Message {
     @Prop({ required: true })
     text: string;
 
-    @Prop({ required: true })
-    recipientId: boolean;
+    @Prop({ required: true, type: Types.ObjectId, ref: Collections.User })
+    user: User;
 
     @Prop({ default: false })
     isRead: boolean;
