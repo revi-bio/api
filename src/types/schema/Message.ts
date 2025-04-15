@@ -11,7 +11,7 @@ export class Message {
     _id: Types.ObjectId;
 
     @Prop({ required: true })
-    titel: string;
+    title: string;
 
     @Prop({ required: true })
     text: string;

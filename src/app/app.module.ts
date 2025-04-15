@@ -10,6 +10,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { FileModule } from 'src/file/file.module';
 import { BioModule } from 'src/bio/bio.module';
 import { MailerModule } from 'src/mailer/mailer.module';
+import { MessageModule } from 'src/message/message.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { MailerModule } from 'src/mailer/mailer.module';
     AuthModule,
     FileModule,
     BioModule,
-    MailerModule
+    MailerModule,
+    MessageModule,
   ],
   controllers: [AppController],
   providers: [

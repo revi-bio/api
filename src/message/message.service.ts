@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Message } from 'src/types/schema/Message';
+import { Message, MessageDocument } from 'src/types/schema/Message';
 import { Model, Types } from 'mongoose';
 import { User } from 'src/types/schema/User';
 
@@ -11,18 +11,18 @@ export class MessageService {
   ) {}
 
   async findById(id: Types.ObjectId) {
-    return await this.messageModel.findById(id);
+    return await this.messageModel.findById(id).exec();
   }
 
-  async findByUser(user: User): Promise<Message[]> {
-    return await this.messageModel.find({ user: user._id });
+  async findByUser(user: User): Promise<MessageDocument[]> {
+    return await this.messageModel.find({ user: user._id }).exec(); 
   }
 
   async createMessage(data: {
     title: string;
     text: string;
     user: User;
-  }): Promise<Message> {
+  }): Promise<MessageDocument> {
     const { title, text, user } = data;
 
     const dbMessage = new this.messageModel({
@@ -42,7 +42,7 @@ export class MessageService {
   }
 
   async markAsRead(user: User, message: Message) {
-    const dbMessage = await this.messageModel.findOne({ user: user._id, _id: message._id });
+    const dbMessage = await this.messageModel.findOne({ user: user._id, _id: message._id }).exec();
     
     if (!dbMessage) {
       throw new Error('Message not found');
