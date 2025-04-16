@@ -26,6 +26,9 @@ export class User {
   @Prop({ type: Types.ObjectId })
   avatar: ObjectId;
 
+  @Prop({ required: true, default: 'user', type: String, enum: ['user', 'admin'] })
+  role: 'user' | 'admin';
+
   /**
    * The property we have for helping database migrations.
    * If we ever update the schema definition, we can increment
