@@ -7,12 +7,9 @@ import { Collections } from 'src/types/Collections';
 import { FileModule } from 'src/file/file.module';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Collections.User, schema: UserSchema }]),
-    FileModule,
-  ],
+  imports: [MongooseModule.forFeature([{ name: Collections.User, schema: UserSchema }]), FileModule],
   providers: [UserService],
   controllers: [UserController],
   exports: [UserService],
 })
-export class UserModule { }
+export class UserModule {}

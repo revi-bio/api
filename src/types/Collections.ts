@@ -1,6 +1,6 @@
 export enum Collections {
-    User = 'User',
-    Setting = 'SettingContainer',
-    Bio = 'Bio',
-    Message = 'Message',
+  User = 'User',
+  Setting = 'SettingContainer',
+  Bio = 'Bio',
+  Message = 'Message',
 }

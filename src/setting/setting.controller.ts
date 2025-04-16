@@ -7,20 +7,20 @@ import { UserService } from 'src/user/user.service';
 
 @Controller('setting')
 export class SettingController {
-    constructor(
-        private readonly settingService: SettingService,
-        private readonly userService: UserService,
-    ) {}
+  constructor(
+    private readonly settingService: SettingService,
+    private readonly userService: UserService,
+  ) {}
 
-    @Get()
-    async getSettings(@CurrentUser() currentUser: JwtData) {
-        const user = await this.userService.fromJwtData(currentUser);
-        return await this.settingService.getSettings(user);
-    }
+  @Get()
+  async getSettings(@CurrentUser() currentUser: JwtData) {
+    const user = await this.userService.fromJwtData(currentUser);
+    return await this.settingService.getSettings(user);
+  }
 
-    @Post()
-    async setSettings(@Body() body: Settings, @CurrentUser() currentUser: JwtData) {
-        const user = await this.userService.fromJwtData(currentUser);
-        await this.settingService.setSettings(user, body);
-    }
+  @Post()
+  async setSettings(@Body() body: Settings, @CurrentUser() currentUser: JwtData) {
+    const user = await this.userService.fromJwtData(currentUser);
+    await this.settingService.setSettings(user, body);
+  }
 }

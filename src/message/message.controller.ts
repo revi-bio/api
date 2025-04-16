@@ -11,7 +11,7 @@ import { JwtData } from 'src/types/JwtData';
 export class MessageController {
   constructor(
     private readonly messageService: MessageService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
   ) {}
 
   @Post()
@@ -28,7 +28,7 @@ export class MessageController {
       text,
       user: dbUser,
     });
-    
+
     const { _id, _schemaVersion, __v, ...data } = dbMessage.depopulate('user').toJSON();
 
     return data;
@@ -48,10 +48,10 @@ export class MessageController {
       throw new NotFoundException('Messages not found');
     }
 
-    const formattedData = dbMessages.map(message => {
-      const {  _schemaVersion, __v, ...data } = message.toJSON();
+    const formattedData = dbMessages.map((message) => {
+      const { _schemaVersion, __v, ...data } = message.toJSON();
 
-      return { ...data};
+      return { ...data };
     });
 
     return formattedData;

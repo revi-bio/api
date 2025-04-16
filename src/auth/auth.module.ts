@@ -16,12 +16,12 @@ import { MailerModule } from 'src/mailer/mailer.module';
       secret: configuration().jwtSecret,
       signOptions: {
         expiresIn: '2d',
-      }
+      },
     }),
     SettingModule,
-    MailerModule
+    MailerModule,
   ],
   providers: [AuthService],
-  controllers: [AuthController]
+  controllers: [AuthController],
 })
 export class AuthModule {}

@@ -11,7 +11,7 @@ export class JwtAuthGuard implements CanActivate {
     private readonly reflector: Reflector,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
@@ -23,7 +23,7 @@ export class JwtAuthGuard implements CanActivate {
       return true;
     }
 
-    // route is not public, needs authentication, 
+    // route is not public, needs authentication,
     // we have to check jwt
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);

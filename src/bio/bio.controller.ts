@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post,ImATeapotException,UseInterceptors, UploadedFile } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  ImATeapotException,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { BioService } from './bio.service';
 import { CurrentUser } from 'src/user/user.decorator';
 import { UserService } from 'src/user/user.service';
@@ -12,15 +24,15 @@ export class BioController {
   constructor(
     private readonly bioService: BioService,
     private readonly userService: UserService,
-    private readonly fileService: FileService
-  ) { }
+    private readonly fileService: FileService,
+  ) {}
 
   @Get()
   async getBios(@CurrentUser() currentUser: JwtData) {
     const dbUser = await this.userService.fromJwtData(currentUser);
     const dbBioList = await this.bioService.findByUser(dbUser);
 
-    const formattedData = dbBioList.map(bio => {
+    const formattedData = dbBioList.map((bio) => {
       const { _id, _schemaVersion, __v, ...data } = bio.toJSON();
 
       return { ...data, views: 0, widgets: 99 };
@@ -33,8 +45,7 @@ export class BioController {
   async getBio(@Param('handle') handle: string, @CurrentUser() currentUser: JwtData) {
     const dbBio = await this.bioService.findByHandle(handle);
 
-    if (!dbBio)
-      throw new NotFoundException();
+    if (!dbBio) throw new NotFoundException();
 
     const { _id, _schemaVersion, __v, ...data } = dbBio.depopulate('user').toJSON();
 
@@ -63,8 +74,7 @@ export class BioController {
     // TODO: make
     const dbBio = await this.bioService.findByHandle(handle);
 
-    if (!dbBio)
-      throw new NotFoundException();
+    if (!dbBio) throw new NotFoundException();
 
     for (const key in body) {
       dbBio[key] = body[key];
@@ -80,33 +90,34 @@ export class BioController {
 
   @Patch(':handle/bioPfp')
   @UseInterceptors(FileInterceptor('file'))
-  async changePfp(@Param('handle') handle: string, @UploadedFile() file: Express.Multer.File, @CurrentUser() CurrentUser: JwtData){
+  async changePfp(
+    @Param('handle') handle: string,
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() CurrentUser: JwtData,
+  ) {
     const dbBio = await this.bioService.findByHandle(handle);
 
-    if (!dbBio)
-      throw new NotFoundException();
+    if (!dbBio) throw new NotFoundException();
 
     if (!file) throw new ImATeapotException();
 
     const dbFile = await this.fileService.uploadFile(file, 'bioPfp');
 
     dbBio.avatar = dbFile;
-    
+
     await dbBio.save();
 
     return dbFile;
   }
 
   @Delete(':handle/bioPfp')
-  async deleteBioPfp(@Param('handle') handle: string, @CurrentUser() currentUser: JwtData){
+  async deleteBioPfp(@Param('handle') handle: string, @CurrentUser() currentUser: JwtData) {
     const dbBio = await this.bioService.findByHandle(handle);
 
-    if (!dbBio)
-      throw new NotFoundException();
+    if (!dbBio) throw new NotFoundException();
 
     dbBio.avatar = undefined;
 
-    
     await dbBio.save();
   }
 
@@ -114,8 +125,7 @@ export class BioController {
   async deleteBio(@Param('handle') handle: string) {
     const dbBio = await this.bioService.findByHandle(handle);
 
-    if (!dbBio)
-      throw new NotFoundException();
+    if (!dbBio) throw new NotFoundException();
 
     await dbBio.deleteOne();
   }

@@ -1,5 +1,5 @@
-import { Types } from "mongoose";
+import { Types } from 'mongoose';
 
 export interface JwtData {
-    id: Types.ObjectId,
+  id: Types.ObjectId;
 }

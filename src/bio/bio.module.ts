@@ -8,14 +8,8 @@ import { UserModule } from 'src/user/user.module';
 import { FileModule } from 'src/file/file.module';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { name: Collections.Bio, schema: BioSchema },
-    ]),
-    UserModule,
-    FileModule,
-  ],
+  imports: [MongooseModule.forFeature([{ name: Collections.Bio, schema: BioSchema }]), UserModule, FileModule],
   providers: [BioService],
-  controllers: [BioController]
+  controllers: [BioController],
 })
-export class BioModule { }
+export class BioModule {}

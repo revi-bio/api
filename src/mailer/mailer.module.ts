@@ -4,7 +4,7 @@ import { MailerService } from './mailer.service';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports:[ConfigModule],
+  imports: [ConfigModule],
   providers: [MailerService],
   exports: [MailerService],
 })

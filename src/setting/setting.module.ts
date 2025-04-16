@@ -7,10 +7,7 @@ import { SettingContainerSchema } from 'src/types/schema/SettingContainer';
 import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Collections.Setting, schema: SettingContainerSchema }]),
-    UserModule,
-  ],
+  imports: [MongooseModule.forFeature([{ name: Collections.Setting, schema: SettingContainerSchema }]), UserModule],
   providers: [SettingService],
   controllers: [SettingController],
   exports: [SettingService],

@@ -25,8 +25,7 @@ export class MailerService {
 
   async sendEmail(dto: SendEmailDto) {
     const { from, recepients, subject } = dto;
-    const html =
-      dto.placeholderReplacements ? this.template(dto.html, dto.placeholderReplacements) : dto.html;
+    const html = dto.placeholderReplacements ? this.template(dto.html, dto.placeholderReplacements) : dto.html;
 
     const options: Mail.Options = {
       from: from ?? {
@@ -47,7 +46,7 @@ export class MailerService {
     }
   }
 
-    /* Usage Example:
+  /* Usage Example:
     #1. Import MailerService to the desired service.
     #2. Define the DTO with required fields.
     #3. Pass the DTO to sendEmail method.
@@ -74,7 +73,4 @@ export class MailerService {
       }
     }
   */
-
 }
-
-

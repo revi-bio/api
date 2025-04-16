@@ -37,7 +37,7 @@ import { MessageModule } from 'src/message/message.module';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
-    }
+    },
   ],
 })
-export class AppModule { }
+export class AppModule {}

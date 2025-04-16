@@ -7,39 +7,44 @@ import { User } from 'src/types/schema/User';
 
 @Injectable()
 export class SettingService {
-    constructor(
-        @InjectModel(Collections.Setting) private readonly settingContainerModel: Model<SettingContainer>,
-    ) { }
+  constructor(
+    @InjectModel(Collections.Setting)
+    private readonly settingContainerModel: Model<SettingContainer>,
+  ) {}
 
-    async initSettings(user: User) {
-        const dbSettingContainer = new this.settingContainerModel({
-            user,
-        });
+  async initSettings(user: User) {
+    const dbSettingContainer = new this.settingContainerModel({
+      user,
+    });
 
-        await dbSettingContainer.save();
+    await dbSettingContainer.save();
+  }
+
+  async getSettings(user: User): Promise<Settings> {
+    const dbSettingContainer = await this.settingContainerModel.findOne({
+      user: user._id,
+    });
+    // initializing default settings with this
+    const settings = new Settings();
+    const userSettingOverrides = dbSettingContainer.settings;
+
+    for (let key in userSettingOverrides) {
+      settings[key] = userSettingOverrides[key];
     }
 
-    async getSettings(user: User): Promise<Settings> {
-        const dbSettingContainer = await this.settingContainerModel.findOne({ user: user._id })
-        // initializing default settings with this
-        const settings = new Settings();
-        const userSettingOverrides = dbSettingContainer.settings;
+    return settings;
+  }
 
-        for (let key in userSettingOverrides) {
-            settings[key] = userSettingOverrides[key];
-        }
+  async setSettings(user: User, settings: Settings) {
+    const dbSettingContainer = await this.settingContainerModel.findOne({
+      user: user._id,
+    });
 
-        return settings;
+    for (let key in settings) {
+      dbSettingContainer.settings[key] = settings[key];
     }
 
-    async setSettings(user: User, settings: Settings) {
-        const dbSettingContainer = await this.settingContainerModel.findOne({ user: user._id })
-
-        for (let key in settings) {
-            dbSettingContainer.settings[key] = settings[key];
-        }
-
-        dbSettingContainer.markModified('settings');
-        await dbSettingContainer.save();
-    }
+    dbSettingContainer.markModified('settings');
+    await dbSettingContainer.save();
+  }
 }

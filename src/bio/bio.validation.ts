@@ -1,4 +1,4 @@
-import { IsAlphanumeric, IsEmail, IsOptional, IsString, IsStrongPassword, Length, MaxLength } from "class-validator";
+import { IsAlphanumeric, IsEmail, IsOptional, IsString, IsStrongPassword, Length, MaxLength } from 'class-validator';
 
 export class CreateBioDto {
   @IsString()
