@@ -52,6 +52,17 @@ export class BioController {
     return { ...data, views: 0, widgets: 99 };
   }
 
+  @Get(':handle/widgets')
+  async getWidgets(@Param('handle') handle: string) {
+    const dbBio = await this.bioService.findByHandle(handle);
+
+    if (!dbBio) throw new NotFoundException();
+
+    const widgets = await this.bioService.getWidgets(dbBio);
+
+    return widgets;
+  }
+
   @Post()
   async createBio(@Body() body: CreateBioDto, @CurrentUser() currentUser: JwtData) {
     const { name, handle } = body;
@@ -67,6 +78,21 @@ export class BioController {
     const { _id, _schemaVersion, __v, ...data } = dbBio.depopulate('user').toJSON();
 
     return data;
+  }
+
+  @Post(':handle/widgets')
+  async addWidget(@Param('handle') handle: string, @Body() body: [object]) {
+    const dbBio = await this.bioService.findByHandle(handle);
+    
+    if (!dbBio) throw new NotFoundException();
+    
+    const { _id, _schemaVersion, __v, ...data } = dbBio.depopulate('user').toJSON();
+    
+    const dbBioWithWidget = await this.bioService.addWidget(dbBio, body);
+
+    const { ...widgetData } = dbBioWithWidget.pages[dbBioWithWidget.pages.length - 1];
+    
+    return { ...widgetData };
   }
 
   @Patch(':handle')

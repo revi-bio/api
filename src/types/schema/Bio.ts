@@ -20,7 +20,7 @@ export class Bio {
   name: string;
 
   @Prop({ required: true, type: [Object], default: [] })
-  widgets: object[];
+  pages: object[];
 
   @Prop({ required: true, type: Types.ObjectId, ref: Collections.User })
   user: User;
