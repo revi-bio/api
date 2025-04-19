@@ -46,14 +46,14 @@ export class BioService {
     return dbBio;
   }
 
-  async addWidget(bio: BioDocument, page: object): Promise<BioDocument> {
-    bio.pages = [page];
+  async addPages(bio: BioDocument, pages: object[]): Promise<BioDocument> {
+    bio.pages = pages;
     await bio.save();
 
     return bio;
   }
 
-  async getWidgets(bio: BioDocument): Promise<object[]> {
+  async getPages(bio: BioDocument): Promise<object[]> {
     return bio.pages;
   }
   
