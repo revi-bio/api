@@ -58,9 +58,9 @@ export class BioController {
 
     if (!dbBio) throw new NotFoundException();
 
-    const widgets = await this.bioService.getPages(dbBio);
+    const pages = await this.bioService.getPages(dbBio);
 
-    return widgets;
+    return pages;
   }
 
   @Post()
@@ -88,11 +88,11 @@ export class BioController {
     
     const { _id, _schemaVersion, __v, ...data } = dbBio.depopulate('user').toJSON();
     
-    const dbBioWithWidget = await this.bioService.addPages(dbBio, body);
+    const dbBioWithPages = await this.bioService.addPages(dbBio, body);
 
-    const { ...widgetData } = dbBioWithWidget.pages[dbBioWithWidget.pages.length - 1];
+    const { ...pagesData } = dbBioWithPages.pages[dbBioWithPages.pages.length - 1];
     
-    return { ...widgetData };
+    return { ...pagesData };
   }
 
   @Patch(':handle')
