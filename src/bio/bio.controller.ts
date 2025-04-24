@@ -63,6 +63,15 @@ export class BioController {
     return pages;
   }
 
+  @Get('wigetImgs/:widgetId')
+  async getWidgetImgs(@Param('widgetId') widgetId: string) {
+    const dbFile = await this.fileService.getFileByIdentifier(widgetId)
+
+    if (!dbFile) throw new NotFoundException();
+    
+    return dbFile;
+  }
+
   @Post()
   async createBio(@Body() body: CreateBioDto, @CurrentUser() currentUser: JwtData) {
     const { name, handle } = body;
@@ -93,6 +102,16 @@ export class BioController {
     const { ...pagesData } = dbBioWithPages.pages[dbBioWithPages.pages.length - 1];
     
     return { ...pagesData };
+  }
+
+  @Patch('widgetImg/:widgetId')
+  @UseInterceptors(FileInterceptor('file'))
+  async changeAvatar(@UploadedFile() file: Express.Multer.File, @Param('widgetId') widgetId : string) {
+    if (!file) throw new ImATeapotException();
+    
+    const dbFile = await this.fileService.uploadFile(file, 'widget', widgetId);
+
+    return dbFile;
   }
 
   @Patch(':handle')
