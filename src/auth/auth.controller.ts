@@ -38,7 +38,7 @@ export class AuthController {
     if (!(await argon2.verify(dbUser.password, password))) {
       throw new NotFoundException('no such username or password');
     }
-
+    
     if (dbUser.validations.filter((v) => v.emailVerification).length) {
       throw new NotFoundException('unconfirmed email address');
     }
@@ -65,6 +65,8 @@ export class AuthController {
       password,
     });
 
+    const route =
+      this.configService.get('FRONTEND_ROOT') + `/webapp/email-verification/${dbUser.validations[0].emailVerification}`;
     await this.settingService.initSettings(dbUser);
 
     const htmlTemplate = readFileSync(join(__dirname, '..', '..', 'assets', 'templates', 'verification.html'), 'utf8');
@@ -78,7 +80,7 @@ export class AuthController {
       subject: 'Welcome to our platform!',
       html: htmlTemplate,
       placeholderReplacements: {
-        emailVerification: dbUser.validations[0].emailVerification,
+        emailVerification: route,
       },
     });
 

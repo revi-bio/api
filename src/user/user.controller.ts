@@ -20,6 +20,7 @@ import { JwtData } from 'src/types/JwtData';
 import { FileService } from 'src/file/file.service';
 import { ChangeDisplayNameDto, ChangePasswordDto, EmailChangeDto } from './user.validation';
 import * as argon2 from 'argon2';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('user')
 export class UserController {
@@ -39,6 +40,7 @@ export class UserController {
   @Get(':username')
   async getInfo() {}
 
+  @Public()
   @Get('verify-email/:emailVerification')
   async verifyEmail(@Param('emailVerification') emailVerification: string) {
     const dbUser = await this.userService.findByVerification('emailVerification', emailVerification);
@@ -51,7 +53,7 @@ export class UserController {
 
     await dbUser.save();
 
-    return { message: 'Email verification successful' };
+    return;
   }
 
   @Patch('email')
