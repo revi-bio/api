@@ -13,4 +13,5 @@ export default () => ({
   mailPassword: process.env.MAIL_PASSWORD || '',
   defMailFrom: process.env.DEFAULT_MAIL_FROM || 'revi.bio',
   appName: process.env.APP_NAME || 'noreply@revibio.app',
+  frontendRoot: process.env.FRONTEND_ROOT || 'revibio.app'
 });
