@@ -5,8 +5,12 @@ export default () => ({
     'THIS SHOULD BE OVERRIDDEN BY A VALUE IN THE .ENV FILE. ALWAYS OVERRIDE THIS VALUE IN PRODUCTION.',
   mongoUri: process.env.MONGO_URI || 'mongodb://localhost/revi',
   jwtExpiration: '1d',
-  mailUser: process.env.MAIL_USER,
-  mailPassword: process.env.MAIL_PASSWORD,
-  defMailFrom: process.env.DEFAULT_MAIL_FROM,
-  appName: process.env.APP_NAME,
+
+  mailHost: process.env.MAIL_HOST || 'localhost',
+  mailPort: process.env.MAIL_PORT || 25,
+  mailSecure: process.env.MAIL_SECURE || false,
+  mailUser: process.env.MAIL_USER || '',
+  mailPassword: process.env.MAIL_PASSWORD || '',
+  defMailFrom: process.env.DEFAULT_MAIL_FROM || 'revi.bio',
+  appName: process.env.APP_NAME || 'noreply@revibio.app',
 });
