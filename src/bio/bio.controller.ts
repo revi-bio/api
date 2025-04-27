@@ -25,12 +25,12 @@ export class BioController {
     private readonly bioService: BioService,
     private readonly userService: UserService,
     private readonly fileService: FileService,
-  ) {}
+  ) { }
 
   @Get()
   async getBios(@CurrentUser() currentUser: JwtData) {
     const dbUser = await this.userService.fromJwtData(currentUser);
-    const dbBioList = await this.bioService.findByUser(dbUser);
+    const dbBioList = await this.bioService.findByUser(dbUser, '-pages');
 
     const formattedData = dbBioList.map((bio) => {
       const { _id, _schemaVersion, __v, ...data } = bio.toJSON();
@@ -75,23 +75,23 @@ export class BioController {
       user: dbUser,
     });
 
-    const { _id, _schemaVersion, __v, ...data } = dbBio.depopulate('user').toJSON();
+    const { _id, _schemaVersion, __v, pages, ...data } = dbBio.depopulate('user').toJSON();
 
-    return data;
+    return { ...data, views: 0, widgets: 0 };
   }
 
   @Post(':handle/pages')
   async addPages(@Param('handle') handle: string, @Body() body: [object]) {
     const dbBio = await this.bioService.findByHandle(handle);
-    
+
     if (!dbBio) throw new NotFoundException();
-    
+
     const { _id, _schemaVersion, __v, ...data } = dbBio.depopulate('user').toJSON();
-    
+
     const dbBioWithPages = await this.bioService.addPages(dbBio, body);
 
     const { ...pagesData } = dbBioWithPages.pages[dbBioWithPages.pages.length - 1];
-    
+
     return { ...pagesData };
   }
 
@@ -99,7 +99,7 @@ export class BioController {
   @UseInterceptors(FileInterceptor('file'))
   async addImage(@UploadedFile() file: Express.Multer.File) {
     if (!file) throw new ImATeapotException();
-    
+
     const dbFile = await this.fileService.uploadFile(file, 'widgetImg');
 
     return dbFile;

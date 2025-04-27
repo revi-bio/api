@@ -7,7 +7,7 @@ import { User } from 'src/types/schema/User';
 
 @Injectable()
 export class BioService {
-  constructor(@InjectModel(Collections.Bio) private readonly bioModel: Model<Bio>) {}
+  constructor(@InjectModel(Collections.Bio) private readonly bioModel: Model<Bio>) { }
 
   async findById(id: Types.ObjectId) {
     return await this.bioModel.findById(id);
@@ -17,8 +17,8 @@ export class BioService {
     return await this.bioModel.findOne({ handle });
   }
 
-  async findByUser(user: User): Promise<BioDocument[]> {
-    return await this.bioModel.find({ user: user._id });
+  async findByUser(user: User, projection: any = ''): Promise<BioDocument[]> {
+    return await this.bioModel.find({ user: user._id }, projection);
   }
 
   async createBio(data: { handle: string; name: string; user: User }): Promise<BioDocument> {
@@ -56,5 +56,5 @@ export class BioService {
   async getPages(bio: BioDocument): Promise<object[]> {
     return bio.pages;
   }
-  
+
 }
