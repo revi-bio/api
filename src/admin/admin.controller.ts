@@ -41,6 +41,15 @@ export class AdminController {
         return { success: true, message: 'Bio deleted successfully' };
     }
 
+    /**
+     * Get all bios in the system
+     */
+    @Get('bios')
+    async getAllBios(@CurrentUser() user: UserDocument) {
+        this.checkAdmin(user);
+        return await this.adminService.getAllBios();
+    }
+
     @Post('users/:userId/messages')
     async sendMessageToUser(
         @CurrentUser() user: UserDocument,

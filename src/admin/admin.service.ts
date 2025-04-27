@@ -57,6 +57,13 @@ export class AdminService {
         await this.bioModel.findByIdAndDelete(bioId);
     }
 
+    /**
+     * Get all bios in the system
+     */
+    async getAllBios(): Promise<BioDocument[]> {
+        return await this.bioModel.find().exec();
+    }
+
 
     async sendMessageToUser(userId: string, title: string, text: string): Promise<MessageDocument> {
         const user = await this.userModel.findById(userId);
