@@ -18,6 +18,7 @@ import { JwtData } from 'src/types/JwtData';
 import { CreateBioDto, EditBioDto } from './bio.validation';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from 'src/file/file.service';
+import { Public } from 'src/auth/public.decorator';
 
 @Controller('bio')
 export class BioController {
@@ -52,6 +53,7 @@ export class BioController {
     return { ...data, views: 0, widgets: 99 };
   }
 
+  @Public()
   @Get(':handle/pages')
   async getPages(@Param('handle') handle: string) {
     const dbBio = await this.bioService.findByHandle(handle);
