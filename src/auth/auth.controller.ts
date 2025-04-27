@@ -65,8 +65,7 @@ export class AuthController {
       password,
     });
 
-    const route =
-      this.configService.get('FRONTEND_ROOT') + `/webapp/email-verification/${dbUser.validations[0].emailVerification}`;
+    const route = this.configService.get('frontendRoot') + `/webapp/email-verification/${dbUser.validations[0].emailVerification}`;
     await this.settingService.initSettings(dbUser);
 
     const htmlTemplate = readFileSync(join(__dirname, '..', '..', 'assets', 'templates', 'verification.html'), 'utf8');
