@@ -11,6 +11,7 @@ import { FileModule } from 'src/file/file.module';
 import { BioModule } from 'src/bio/bio.module';
 import { MailerModule } from 'src/mailer/mailer.module';
 import { MessageModule } from 'src/message/message.module';
+import { AdminModule } from 'src/admin/admin.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { MessageModule } from 'src/message/message.module';
     BioModule,
     MailerModule,
     MessageModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [
