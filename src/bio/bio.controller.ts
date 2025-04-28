@@ -10,6 +10,7 @@ import {
   ImATeapotException,
   UseInterceptors,
   UploadedFile,
+  ForbiddenException,
 } from '@nestjs/common';
 import { BioService } from './bio.service';
 import { CurrentUser } from 'src/user/user.decorator';
@@ -131,17 +132,39 @@ export class BioController {
   async changePfp(
     @Param('handle') handle: string,
     @UploadedFile() file: Express.Multer.File,
-    @CurrentUser() CurrentUser: JwtData,
+    @CurrentUser() currentUser: JwtData,
   ) {
     const dbBio = await this.bioService.findByHandle(handle);
 
     if (!dbBio) throw new NotFoundException();
-
     if (!file) throw new ImATeapotException();
+    if (dbBio.user._id != currentUser.id) throw new ForbiddenException();
 
     const dbFile = await this.fileService.uploadFile(file, 'bioPfp');
 
     dbBio.avatar = dbFile;
+
+    await dbBio.save();
+
+    return dbFile;
+  }
+
+  @Patch(':handle/bioWallpaper')
+  @UseInterceptors(FileInterceptor('file'))
+  async changeWallpaper(
+    @Param('handle') handle: string,
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() currentUser: JwtData,
+  ) {
+    const dbBio = await this.bioService.findByHandle(handle);
+
+    if (!dbBio) throw new NotFoundException();
+    if (!file) throw new ImATeapotException();
+    if (dbBio.user._id != currentUser.id) throw new ForbiddenException();
+
+    const dbFile = await this.fileService.uploadFile(file, 'bioWallpaper');
+
+    dbBio.backgroundImage = dbFile;
 
     await dbBio.save();
 
