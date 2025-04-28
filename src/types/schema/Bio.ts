@@ -15,7 +15,6 @@ export class Bio {
   @Prop({ required: true, index: { unique: true } })
   handle: string;
 
-  //  INFO: subject to change, we might just yank this data out from the profile widget later
   @Prop({ required: true })
   name: string;
 
@@ -24,6 +23,10 @@ export class Bio {
 
   @Prop({ required: true, type: Types.ObjectId, ref: Collections.User })
   user: User;
+
+  // TODO: make a separate backgrond object that includes color, gradient, image
+  @Prop({ type: Types.ObjectId })
+  backgroundImage: ObjectId;
 
   @Prop({ type: Types.ObjectId })
   avatar: ObjectId;
