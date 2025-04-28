@@ -11,6 +11,7 @@ import { SettingService } from 'src/setting/setting.service';
 import { MailerService } from 'src/mailer/mailer.service';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { MessageService } from 'src/message/message.service';
 
 @Controller('auth')
 export class AuthController {
@@ -20,6 +21,7 @@ export class AuthController {
     private readonly configService: ConfigService,
     private readonly settingService: SettingService,
     private readonly mailerService: MailerService,
+    private readonly messageService: MessageService,
   ) {}
 
   @Public()
@@ -64,6 +66,8 @@ export class AuthController {
       email,
       password,
     });
+
+    await this.messageService.createMessage({title: 'Welcome! 🎉', text: "Thank you for registering with us! We're excited to have you as part of our community. Your account has been successfully created, and you're now ready to explore everything we have to offer. \nIf you have any questions or need assistance, feel free to reach out — we're here to help!", user: dbUser})
 
     const route = this.configService.get('frontendRoot') + `/email-verification/${dbUser.validations[0].emailVerification}`;
     await this.settingService.initSettings(dbUser);

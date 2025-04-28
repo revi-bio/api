@@ -7,6 +7,7 @@ import { secureHeapUsed } from 'crypto';
 import configuration from 'src/configuration';
 import { SettingModule } from 'src/setting/setting.module';
 import { MailerModule } from 'src/mailer/mailer.module';
+import { MessageModule } from 'src/message/message.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MailerModule } from 'src/mailer/mailer.module';
     }),
     SettingModule,
     MailerModule,
+    MessageModule,
   ],
   providers: [AuthService],
   controllers: [AuthController],
