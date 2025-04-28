@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UnauthorizedException, UseGuards, InternalServerErrorException } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CurrentUser } from 'src/user/user.decorator';
@@ -10,15 +10,28 @@ import { SendMessageDto } from './admin.validation';
 export class AdminController {
     constructor(private readonly adminService: AdminService) {}
     private checkAdmin(user: UserDocument) {
+        if (!user) {
+            throw new UnauthorizedException('User not found in request');
+        }
+        
         if (user.role !== 'admin') {
-            throw new Error('Unauthorized: Admin access required');
+            throw new UnauthorizedException('Admin access required');
         }
     }
 
     @Get('users')
     async getAllUsers(@CurrentUser() user: UserDocument) {
-        this.checkAdmin(user);
-        return await this.adminService.getAllUsers();
+        try {
+            this.checkAdmin(user);
+            const users = await this.adminService.getAllUsers();
+            return users;
+        } catch (error) {
+            console.error('Error in getAllUsers:', error);
+            if (error instanceof UnauthorizedException) {
+                throw error;
+            }
+            throw new InternalServerErrorException('Failed to fetch users');
+        }
     }
 
     @Delete('users/:userId')
@@ -52,7 +65,7 @@ export class AdminController {
 
     @Post('users/:userId/messages')
     async sendMessageToUser(
-        @CurrentUser() user: UserDocument,
+        @CurrentUser() user: UserDocument,  
         @Param('userId') userId: string,
         @Body() messageData: SendMessageDto
     ) {
