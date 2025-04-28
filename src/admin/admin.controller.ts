@@ -4,25 +4,27 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CurrentUser } from 'src/user/user.decorator';
 import { UserDocument } from 'src/types/schema/User';
 import { SendMessageDto } from './admin.validation';
+import { JwtData } from 'src/types/JwtData';
+import { UserService } from 'src/user/user.service';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard)
 export class AdminController {
-    constructor(private readonly adminService: AdminService) {}
-    private checkAdmin(user: UserDocument) {
-        if (!user) {
-            throw new UnauthorizedException('User not found in request');
-        }
-        
-        if (user.role !== 'admin') {
+    constructor(private readonly adminService: AdminService, private readonly userService: UserService) {}
+
+    private async checkAdmin(currentUser: JwtData) {
+        const dbUser = await this.userService.fromJwtData(currentUser);
+
+        if (dbUser.role !== 'admin') {
             throw new UnauthorizedException('Admin access required');
         }
     }
 
     @Get('users')
-    async getAllUsers(@CurrentUser() user: UserDocument) {
+    async getAllUsers(@CurrentUser() currentUser: JwtData) {
+        
         try {
-            this.checkAdmin(user);
+            await this.checkAdmin(currentUser);
             const users = await this.adminService.getAllUsers();
             return users;
         } catch (error) {
@@ -35,21 +37,21 @@ export class AdminController {
     }
 
     @Delete('users/:userId')
-    async deleteUser(@CurrentUser() user: UserDocument, @Param('userId') userId: string) {
-        this.checkAdmin(user);
+    async deleteUser(@CurrentUser() currentUser: JwtData, @Param('userId') userId: string) {
+        this.checkAdmin(currentUser);
         await this.adminService.deleteUser(userId);
         return { success: true, message: 'User deleted successfully' };
     }
 
     @Get('users/:userId/bios')
-    async getUserBios(@CurrentUser() user: UserDocument, @Param('userId') userId: string) {
-        this.checkAdmin(user);
+    async getUserBios(@CurrentUser() currentUser: JwtData, @Param('userId') userId: string) {
+        this.checkAdmin(currentUser);
         return await this.adminService.getUserBios(userId);
     }
 
     @Delete('bios/:bioId')
-    async deleteBio(@CurrentUser() user: UserDocument, @Param('bioId') bioId: string) {
-        this.checkAdmin(user);
+    async deleteBio(@CurrentUser() currentUser: JwtData, @Param('bioId') bioId: string) {
+        this.checkAdmin(currentUser);
         await this.adminService.deleteBio(bioId);
         return { success: true, message: 'Bio deleted successfully' };
     }
@@ -58,18 +60,18 @@ export class AdminController {
      * Get all bios in the system
      */
     @Get('bios')
-    async getAllBios(@CurrentUser() user: UserDocument) {
-        this.checkAdmin(user);
+    async getAllBios(@CurrentUser() currentUser: JwtData) {
+        this.checkAdmin(currentUser);
         return await this.adminService.getAllBios();
     }
 
     @Post('users/:userId/messages')
     async sendMessageToUser(
-        @CurrentUser() user: UserDocument,  
+        @CurrentUser() currentUser: JwtData,  
         @Param('userId') userId: string,
         @Body() messageData: SendMessageDto
     ) {
-        this.checkAdmin(user);
+        this.checkAdmin(currentUser);
         const message = await this.adminService.sendMessageToUser(
             userId,
             messageData.title,
@@ -80,10 +82,10 @@ export class AdminController {
     
     @Post('messages/broadcast')
     async sendMessageToAllUsers(
-        @CurrentUser() user: UserDocument,
+        @CurrentUser() currentUser: JwtData,
         @Body() messageData: SendMessageDto
     ) {
-        this.checkAdmin(user);
+        this.checkAdmin(currentUser);
         const count = await this.adminService.sendMessageToAllUsers(
             messageData.title,
             messageData.text

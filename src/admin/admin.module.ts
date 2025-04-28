@@ -6,6 +6,7 @@ import { BioSchema } from 'src/types/schema/Bio';
 import { MessageSchema } from 'src/types/schema/Message';
 import { AdminController } from './admin.controller';
 import { AdminService } from './admin.service';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AdminService } from './admin.service';
       { name: Collections.Bio, schema: BioSchema },
       { name: Collections.Message, schema: MessageSchema },
     ]),
+    UserModule,
   ],
   controllers: [AdminController],
   providers: [AdminService],
