@@ -1,8 +1,8 @@
-import { IsAlphanumeric, IsEmail, IsOptional, IsString, IsStrongPassword, Length, MaxLength } from 'class-validator';
+import { IsAlphanumeric, IsEmail, IsOptional, IsString, IsStrongPassword, Length, Matches, MaxLength } from 'class-validator';
 
 export class CreateBioDto {
   @IsString()
-  @IsAlphanumeric()
+  @Matches(/^[a-z0-9-_.]+$/)
   @Length(1, 32)
   handle: string;
 
@@ -14,7 +14,7 @@ export class CreateBioDto {
 export class EditBioDto {
   @IsOptional()
   @IsString()
-  @IsAlphanumeric()
+  @Matches(/^[a-z0-9-_.]+$/)
   @Length(1, 32)
   handle: string;
 
