@@ -87,6 +87,6 @@ export class AuthController {
       },
     });
 
-    return this.login({ email, password });
+    return
   }
 }
