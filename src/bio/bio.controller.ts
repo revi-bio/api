@@ -27,17 +27,19 @@ export class BioController {
     private readonly bioService: BioService,
     private readonly userService: UserService,
     private readonly fileService: FileService,
-  ) { }
+  ) {}
 
   @Get()
   async getBios(@CurrentUser() currentUser: JwtData) {
     const dbUser = await this.userService.fromJwtData(currentUser);
-    const dbBioList = await this.bioService.findByUser(dbUser, '-pages');
+    const dbBioList = await this.bioService.findByUser(dbUser);
 
     const formattedData = dbBioList.map((bio) => {
-      const { _id, _schemaVersion, __v, ...data } = bio.toJSON();
-
-      return { ...data, views: 0, widgets: 99 };
+      const { _id, _schemaVersion, __v, pages, ...data } = bio.toJSON();
+      const widgets = Array.isArray(pages)
+        ? pages.reduce((total, page: { widgets?: any[] }) => total + (page.widgets?.length || 0), 0)
+        : 0;
+      return { ...data, views: 0, widgetsCount: widgets, pagesCount: pages.length };
     });
 
     return formattedData;
@@ -49,9 +51,11 @@ export class BioController {
 
     if (!dbBio) throw new NotFoundException();
 
-    const { _id, _schemaVersion, __v, ...data } = dbBio.depopulate('user').toJSON();
-
-    return { ...data, views: 0, widgets: 99 };
+    const { _id, _schemaVersion, __v, pages, ...data } = dbBio.depopulate('user').toJSON();
+    const widgets = Array.isArray(pages)
+      ? pages.reduce((total, page: { widgets?: any[] }) => total + (page.widgets?.length || 0), 0)
+      : 0;
+    return { ...data, views: 0, widgetsCount: widgets, pagesCount: pages.length };
   }
 
   @Public()
