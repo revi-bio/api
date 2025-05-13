@@ -36,6 +36,13 @@ export class AdminController {
         }
     }
 
+    @Get('users/:userId/verify')
+    async verifyUser(@CurrentUser() currentUser: JwtData, @Param('userId') userId: string) {
+        this.checkAdmin(currentUser);
+        await this.adminService.verifyUser(userId);
+        return { success: true, message: 'User verified successfully' };
+    }
+
     @Delete('users/:userId')
     async deleteUser(@CurrentUser() currentUser: JwtData, @Param('userId') userId: string) {
         this.checkAdmin(currentUser);

@@ -37,6 +37,21 @@ export class AdminService {
         await this.userModel.findByIdAndDelete(userId);
     }
 
+    async verifyUser(userId: string): Promise<void> {
+        const user = await this.userModel.findById(userId);
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        if (user.validations && Array.isArray(user.validations)) {
+            user.validations = user.validations.filter(validation => !validation.emailVerification);
+        }
+
+        await user.save();
+
+        return;
+    }
+
 
     async getUserBios(userId: string): Promise<BioDocument[]> {
         const user = await this.userModel.findById(userId);
