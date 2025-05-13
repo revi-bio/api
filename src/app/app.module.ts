@@ -12,6 +12,7 @@ import { BioModule } from 'src/bio/bio.module';
 import { MailerModule } from 'src/mailer/mailer.module';
 import { MessageModule } from 'src/message/message.module';
 import { AdminModule } from 'src/admin/admin.module';
+import { StatisticsModule } from 'src/statistics/statistics.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AdminModule } from 'src/admin/admin.module';
     MailerModule,
     MessageModule,
     AdminModule,
+    StatisticsModule,
   ],
   controllers: [AppController],
   providers: [
