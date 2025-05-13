@@ -27,13 +27,11 @@ export class AdminService {
             throw new NotFoundException('User not found');
         }
         
-        // Delete user's bios
+
         await this.bioModel.deleteMany({ user: user._id });
         
-        // Delete user's messages
         await this.messageModel.deleteMany({ user: user._id });
-        
-        // Delete the user
+
         await this.userModel.findByIdAndDelete(userId);
     }
 
@@ -72,11 +70,16 @@ export class AdminService {
         await this.bioModel.findByIdAndDelete(bioId);
     }
 
-    /**
-     * Get all bios in the system
-     */
-    async getAllBios(): Promise<BioDocument[]> {
-        return await this.bioModel.find().exec();
+    async getAllBios(): Promise<any[]> {
+        const dbBioList = await this.bioModel.find().exec();
+            
+        const formattedData = dbBioList.map((bio) => {
+        const { _id, _schemaVersion, __v, pages, ...data } = bio.toJSON();
+        const widgets = Array.isArray(pages)
+        ? pages.reduce((total, page: { widgets?: any[] }) => total + (page.widgets?.length || 0), 0): 0;
+        return { ...data, views: 0, widgetsCount: widgets, pagesCount: pages.length };
+            });
+        return formattedData;
     }
 
 
