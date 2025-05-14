@@ -13,6 +13,7 @@ import { MailerModule } from 'src/mailer/mailer.module';
 import { MessageModule } from 'src/message/message.module';
 import { AdminModule } from 'src/admin/admin.module';
 import { StatisticsModule } from 'src/statistics/statistics.module';
+import { SpotifyModule } from 'src/spotify/spotify.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { StatisticsModule } from 'src/statistics/statistics.module';
     MessageModule,
     AdminModule,
     StatisticsModule,
+    SpotifyModule,
   ],
   controllers: [AppController],
   providers: [
