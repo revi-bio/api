@@ -34,7 +34,7 @@ export class StatisticsController {
 
     @Get('views')
     async getViews() {
-        return (new Array(30)).map(() => Math.ceil(Math.random() * 10));
+        return (new Array(30)).fill(0).map(() => Math.ceil(Math.random() * 10));
     }
 
     @Get('referral-distribution')
