@@ -1,5 +1,9 @@
 import { IsAlphanumeric, IsEmail, IsOptional, IsString, IsStrongPassword, Length, Matches, MaxLength } from 'class-validator';
 
+export class SubmitClickDto {}
+
+export class SubmitViewDto {}
+
 export class CreateBioDto {
   @IsString()
   @Matches(/^[a-z0-9-_.]+$/)
