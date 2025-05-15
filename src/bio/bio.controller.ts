@@ -47,6 +47,18 @@ export class BioController {
     if (!dbBio) throw new NotFoundException();
 
     const container = await this.bioService.getTodaysVisitContainer(dbBio);
+    
+    // Check if the visitor exists, if not create it
+    if (!container.visits[visitorId]) {
+      container.visits[visitorId] = {
+        clicks: [],
+        countryCode: 'hu',
+        referrer: undefined,
+        challengeAnswer: 0, // Default value, will be overridden if challenge is requested
+        challengeCompleted: false,
+      };
+    }
+    
     if (!container.visits[visitorId].challengeCompleted) {
       if (container.visits[visitorId].challengeAnswer != challengeAnswer)
         throw new UnauthorizedException();
@@ -69,6 +81,18 @@ export class BioController {
     if (!dbBio) throw new NotFoundException();
 
     const container = await this.bioService.getTodaysVisitContainer(dbBio);
+    
+    // Check if the visitor exists, if not create it
+    if (!container.visits[visitorId]) {
+      container.visits[visitorId] = {
+        clicks: [],
+        countryCode: 'hu',
+        referrer: undefined,
+        challengeAnswer: 0, // Default value, will be overridden if challenge is requested
+        challengeCompleted: false,
+      };
+    }
+    
     if (!container.visits[visitorId].challengeCompleted) {
       if (container.visits[visitorId].challengeAnswer != challengeAnswer)
         throw new UnauthorizedException();
