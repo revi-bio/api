@@ -120,4 +120,16 @@ export class AdminService {
         
         return messages.length;
     }
+
+    async addBadgeToUsers(badgeName: string, badgeIcon: string, users: string[]){
+        
+        users.forEach(async userId => {
+            const user = await this.userModel.findById(userId);
+            user.badges.push({
+                name: badgeName,
+                icon: badgeIcon
+            })
+        });
+        return;
+    }
 }
