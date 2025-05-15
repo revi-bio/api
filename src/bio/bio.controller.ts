@@ -51,19 +51,6 @@ export class BioController {
     // Find the visitor in the array
     let visitor = container.visits.find(v => v.visitorId === visitorId);
     
-    // If visitor doesn't exist, create it
-    if (!visitor) {
-      visitor = {
-        visitorId,
-        clicks: [],
-        countryCode: 'hu',
-        referrer: undefined,
-        challengeAnswer: 0, // Default value, will be overridden if challenge is requested
-        challengeCompleted: false,
-      };
-      container.visits.push(visitor);
-    }
-    
     if (!visitor.challengeCompleted) {
       if (visitor.challengeAnswer != challengeAnswer)
         throw new UnauthorizedException();
@@ -89,19 +76,6 @@ export class BioController {
     
     // Find the visitor in the array
     let visitor = container.visits.find(v => v.visitorId === visitorId);
-    
-    // If visitor doesn't exist, create it
-    if (!visitor) {
-      visitor = {
-        visitorId,
-        clicks: [],
-        countryCode: 'hu',
-        referrer: undefined,
-        challengeAnswer: 0, // Default value, will be overridden if challenge is requested
-        challengeCompleted: false,
-      };
-      container.visits.push(visitor);
-    }
     
     if (!visitor.challengeCompleted) {
       if (visitor.challengeAnswer != challengeAnswer)
