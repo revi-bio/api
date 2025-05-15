@@ -33,75 +33,162 @@ export class StatisticsService {
   }
 
   async getBiosByUser(userId: string | Types.ObjectId): Promise<BioDocument[]> {
-    return await this.bioModel.find({ user: userId });
+    console.log('getBiosByUser userId:', userId);
+    console.log('getBiosByUser userId type:', typeof userId);
+    
+    // Convert string ID to ObjectId if needed
+    const userIdObj = typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
+    console.log('getBiosByUser userIdObj:', userIdObj);
+    
+    const bios = await this.bioModel.find({ user: userIdObj });
+    console.log('getBiosByUser bios count:', bios.length);
+    console.log('getBiosByUser bios:', bios.map(bio => bio._id));
+    return bios;
   }
 
   async getTotalViews(bioId?: string | Types.ObjectId, userId?: string | Types.ObjectId): Promise<number> {
     let query = {};
     
     if (bioId) {
-      const bio = await this.bioModel.findById(bioId);
+      // Convert string ID to ObjectId if needed
+      const bioIdObj = typeof bioId === 'string' ? new Types.ObjectId(bioId) : bioId;
+      const bio = await this.bioModel.findById(bioIdObj);
       if (!bio) {
         throw new NotFoundException('Bio not found');
       }
       query = { bio: bio._id };
     } else if (userId) {
       // If userId is provided but no bioId, get all bios for this user
-      const userBios = await this.bioModel.find({ user: userId });
+      console.log('getTotalViews userId:', userId);
+      console.log('getTotalViews userId type:', typeof userId);
+      
+      // Convert string ID to ObjectId if needed
+      const userIdObj = typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
+      console.log('getTotalViews userIdObj:', userIdObj);
+      
+      const userBios = await this.bioModel.find({ user: userIdObj });
+      console.log('getTotalViews userBios count:', userBios.length);
+      console.log('getTotalViews userBios:', userBios.map(bio => bio._id));
+      
       if (!userBios || userBios.length === 0) {
         return 0;
       }
+      
       const bioIds = userBios.map(bio => bio._id);
       query = { bio: { $in: bioIds } };
     }
     
-    const visitContainers = await this.bioVisitContainerModel.find(query);
+    console.log('getTotalViews query:', JSON.stringify(query));
     
-    return visitContainers.reduce((total, container) => {
-      return total + container.visits.length;
-    }, 0);
+    // First, try to find all visit containers regardless of query to see what's in the database
+    const allContainers = await this.bioVisitContainerModel.find({});
+    console.log('All containers in database:', allContainers.length);
+    console.log('All container IDs:', allContainers.map(container => container._id));
+    console.log('All container bio IDs:', allContainers.map(container => container.bio));
+    
+    // Now find containers matching our query
+    const visitContainers = await this.bioVisitContainerModel.find(query);
+    console.log('getTotalViews containers:', visitContainers.length);
+    console.log('getTotalViews container IDs:', visitContainers.map(container => container._id));
+    
+    let totalVisits = 0;
+    
+    // Count visits from all containers if no specific query was provided
+    if (Object.keys(query).length === 0) {
+      console.log('No specific query provided, counting all visits');
+      allContainers.forEach(container => {
+        console.log(`Container ${container._id} has ${container.visits.length} visits`);
+        totalVisits += container.visits.length;
+      });
+    } else {
+      // Count visits from containers matching the query
+      visitContainers.forEach(container => {
+        console.log(`Container ${container._id} has ${container.visits.length} visits`);
+        totalVisits += container.visits.length;
+      });
+    }
+    
+    return totalVisits;
   }
 
   async getTotalClicks(bioId?: string | Types.ObjectId, userId?: string | Types.ObjectId): Promise<number> {
     let query = {};
     
     if (bioId) {
-      const bio = await this.bioModel.findById(bioId);
+      // Convert string ID to ObjectId if needed
+      const bioIdObj = typeof bioId === 'string' ? new Types.ObjectId(bioId) : bioId;
+      const bio = await this.bioModel.findById(bioIdObj);
       if (!bio) {
         throw new NotFoundException('Bio not found');
       }
       query = { bio: bio._id };
     } else if (userId) {
       // If userId is provided but no bioId, get all bios for this user
-      const userBios = await this.bioModel.find({ user: userId });
+      console.log('getTotalClicks userId:', userId);
+      
+      // Convert string ID to ObjectId if needed
+      const userIdObj = typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
+      console.log('getTotalClicks userIdObj:', userIdObj);
+      
+      const userBios = await this.bioModel.find({ user: userIdObj });
+      console.log('getTotalClicks userBios count:', userBios.length);
+      
       if (!userBios || userBios.length === 0) {
         return 0;
       }
+      
       const bioIds = userBios.map(bio => bio._id);
       query = { bio: { $in: bioIds } };
     }
     
-    const visitContainers = await this.bioVisitContainerModel.find(query);
+    console.log('getTotalClicks query:', JSON.stringify(query));
     
-    return visitContainers.reduce((total, container) => {
-      return total + container.visits.reduce((clickTotal, visitor: Visitor) => {
-        return clickTotal + visitor.clicks.length;
+    // First, try to find all visit containers regardless of query to see what's in the database
+    const allContainers = await this.bioVisitContainerModel.find({});
+    console.log('All containers for clicks:', allContainers.length);
+    
+    // Now find containers matching our query
+    const visitContainers = await this.bioVisitContainerModel.find(query);
+    console.log('getTotalClicks containers:', visitContainers.length);
+    
+    let totalClicks = 0;
+    
+    // Count clicks from all containers if no specific query was provided
+    if (Object.keys(query).length === 0) {
+      console.log('No specific query provided for clicks, counting all clicks');
+      totalClicks = allContainers.reduce((total, container) => {
+        return total + container.visits.reduce((clickTotal, visitor: Visitor) => {
+          return clickTotal + visitor.clicks.length;
+        }, 0);
       }, 0);
-    }, 0);
+    } else {
+      // Count clicks from containers matching the query
+      totalClicks = visitContainers.reduce((total, container) => {
+        return total + container.visits.reduce((clickTotal, visitor: Visitor) => {
+          return clickTotal + visitor.clicks.length;
+        }, 0);
+      }, 0);
+    }
+    
+    return totalClicks;
   }
 
   async getCountryDistribution(bioId?: string | Types.ObjectId, userId?: string | Types.ObjectId): Promise<Record<string, number>> {
     let query = {};
     
     if (bioId) {
-      const bio = await this.bioModel.findById(bioId);
+      // Convert string ID to ObjectId if needed
+      const bioIdObj = typeof bioId === 'string' ? new Types.ObjectId(bioId) : bioId;
+      const bio = await this.bioModel.findById(bioIdObj);
       if (!bio) {
         throw new NotFoundException('Bio not found');
       }
       query = { bio: bio._id };
     } else if (userId) {
       // If userId is provided but no bioId, get all bios for this user
-      const userBios = await this.bioModel.find({ user: userId });
+      // Convert string ID to ObjectId if needed
+      const userIdObj = typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
+      const userBios = await this.bioModel.find({ user: userIdObj });
       if (!userBios || userBios.length === 0) {
         return {};
       }
@@ -132,14 +219,18 @@ export class StatisticsService {
     let query = {};
     
     if (bioId) {
-      const bio = await this.bioModel.findById(bioId);
+      // Convert string ID to ObjectId if needed
+      const bioIdObj = typeof bioId === 'string' ? new Types.ObjectId(bioId) : bioId;
+      const bio = await this.bioModel.findById(bioIdObj);
       if (!bio) {
         throw new NotFoundException('Bio not found');
       }
       query = { bio: bio._id };
     } else if (userId) {
       // If userId is provided but no bioId, get all bios for this user
-      const userBios = await this.bioModel.find({ user: userId });
+      // Convert string ID to ObjectId if needed
+      const userIdObj = typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
+      const userBios = await this.bioModel.find({ user: userIdObj });
       if (!userBios || userBios.length === 0) {
         return {};
       }
@@ -170,14 +261,18 @@ export class StatisticsService {
     let query = {};
     
     if (bioId) {
-      const bio = await this.bioModel.findById(bioId);
+      // Convert string ID to ObjectId if needed
+      const bioIdObj = typeof bioId === 'string' ? new Types.ObjectId(bioId) : bioId;
+      const bio = await this.bioModel.findById(bioIdObj);
       if (!bio) {
         throw new NotFoundException('Bio not found');
       }
       query = { bio: bio._id };
     } else if (userId) {
       // If userId is provided but no bioId, get all bios for this user
-      const userBios = await this.bioModel.find({ user: userId });
+      // Convert string ID to ObjectId if needed
+      const userIdObj = typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
+      const userBios = await this.bioModel.find({ user: userIdObj });
       if (!userBios || userBios.length === 0) {
         return {};
       }
@@ -209,14 +304,18 @@ export class StatisticsService {
     let query = {};
     
     if (bioId) {
-      const bio = await this.bioModel.findById(bioId);
+      // Convert string ID to ObjectId if needed
+      const bioIdObj = typeof bioId === 'string' ? new Types.ObjectId(bioId) : bioId;
+      const bio = await this.bioModel.findById(bioIdObj);
       if (!bio) {
         throw new NotFoundException('Bio not found');
       }
       query = { bio: bio._id };
     } else if (userId) {
       // If userId is provided but no bioId, get all bios for this user
-      const userBios = await this.bioModel.find({ user: userId });
+      // Convert string ID to ObjectId if needed
+      const userIdObj = typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
+      const userBios = await this.bioModel.find({ user: userIdObj });
       if (!userBios || userBios.length === 0) {
         return Array(days).fill(0);
       }

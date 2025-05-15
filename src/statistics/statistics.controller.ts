@@ -12,10 +12,14 @@ export class StatisticsController {
 
     @Get('info')
     async getInfo(@CurrentUser() currentUser: JwtData) {
+        console.log('getInfo currentUser:', currentUser);
+        
         // Get all bios owned by the current user
         const userBios = await this.statisticsService.getBiosByUser(currentUser.id);
+        console.log('getInfo userBios:', userBios.map(bio => bio._id));
         
         if (!userBios || userBios.length === 0) {
+            console.log('No bios found for user');
             return {
                 views: 0,
                 linksClicked: 0,
@@ -26,6 +30,9 @@ export class StatisticsController {
         // Calculate total views and clicks for all user's bios in one go
         const totalViews = await this.statisticsService.getTotalViews(undefined, currentUser.id);
         const totalClicks = await this.statisticsService.getTotalClicks(undefined, currentUser.id);
+        
+        console.log('getInfo totalViews:', totalViews);
+        console.log('getInfo totalClicks:', totalClicks);
         
         // For now, we'll keep the avgSecondsOnSites as a static value
         // In the future, this could be calculated from actual session data
