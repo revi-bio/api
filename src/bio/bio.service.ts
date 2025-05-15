@@ -71,7 +71,10 @@ export class BioService {
     const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
 
     let container = await this.bioVisitContainerModel.findOne({ bio, createdAt: { $gte: startOfDay, $lt: endOfDay } });
-    if (!container) container = new this.bioVisitContainerModel({ bio });
+    if (!container) {
+      container = new this.bioVisitContainerModel({ bio });
+      await container.save(); // Save the new container to the database
+    }
 
     return container;
   }
