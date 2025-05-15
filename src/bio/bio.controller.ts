@@ -100,6 +100,8 @@ export class BioController {
       challengeCompleted: false,
     };
 
+    console.log(container);
+
     container.markModified('visits');
     await container.save();
 
