@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, UnauthorizedException, UseG
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { CurrentUser } from 'src/user/user.decorator';
-import { UserDocument } from 'src/types/schema/User';
+import { User, UserDocument } from 'src/types/schema/User';
 import { SendMessageDto } from './admin.validation';
 import { JwtData } from 'src/types/JwtData';
 import { UserService } from 'src/user/user.service';
@@ -98,5 +98,21 @@ export class AdminController {
             messageData.text
         );
         return { success: true, message: `Message sent to ${count} users`, count };
+    }
+
+    @Post('badge')
+    async addBadgeToUsers(
+        @CurrentUser() currentUser: JwtData,
+        @Body() body: { badgeName: string; badgeIcon: string; users: string[] }
+        ){
+        const { badgeName, badgeIcon, users } = body;
+        this.checkAdmin(currentUser);
+        
+        const badge = await this.adminService.addBadgeToUsers(
+            badgeName,
+            badgeIcon,
+            users
+        )
+        return;
     }
 }

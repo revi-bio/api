@@ -29,6 +29,9 @@ export class User {
   @Prop({ required: true, default: 'user', type: String, enum: ['user', 'admin'] })
   role: 'user' | 'admin';
 
+  @Prop({ type: [Object], default: [] })
+  badges: object[];
+
   /**
    * The property we have for helping database migrations.
    * If we ever update the schema definition, we can increment
