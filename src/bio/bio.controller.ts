@@ -97,6 +97,7 @@ export class BioController {
       countryCode: 'hu',
       referrer: undefined,
       challengeAnswer: answer,
+      challengeCompleted: false,
     };
 
     container.markModified('visits');
