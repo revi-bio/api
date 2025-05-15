@@ -45,6 +45,7 @@ export class BioController {
     return formattedData;
   }
 
+  @Public()
   @Get(':handle')
   async getBio(@Param('handle') handle: string, @CurrentUser() currentUser: JwtData) {
     const dbBio = await this.bioService.findByHandle(handle);
