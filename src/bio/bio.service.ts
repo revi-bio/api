@@ -66,7 +66,11 @@ export class BioService {
   }
 
   async getTodaysVisitContainer(bio: BioDocument): Promise<BioVisitContainerDocument> {
-    let container = await this.bioVisitContainerModel.findOne({ bio, createdAt: new Date() });
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+
+    let container = await this.bioVisitContainerModel.findOne({ bio, createdAt: { $gte: startOfDay, $lt: endOfDay } });
     if (!container) container = new this.bioVisitContainerModel({ bio });
 
     return container;
