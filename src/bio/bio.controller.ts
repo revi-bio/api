@@ -63,7 +63,7 @@ export class BioController {
   async submitView(
     @Headers('Challenge-Answer') challengeAnswer: number,
     @Param('handle') handle: string,
-    @Param('visitorid') visitorId: number,
+    @Param('visitorid') visitorId: string,
   ) {
     const dbBio = await this.bioService.findByHandle(handle);
     if (!dbBio) throw new NotFoundException();
@@ -83,7 +83,7 @@ export class BioController {
   @Get(':handle/visitor/:visitorid/challenge')
   async requestChallenge(
     @Param('handle') handle: string,
-    @Param('visitorid') visitorId: number,
+    @Param('visitorid') visitorId: string,
   ) {
     const dbBio = await this.bioService.findByHandle(handle);
     if (!dbBio) throw new NotFoundException();

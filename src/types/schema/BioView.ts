@@ -30,7 +30,7 @@ export class BioVisitContainer {
   bio: Bio;
 
   @Prop({ required: true, type: Object, default: [] })
-  visits: { [key: number]: Visitor };
+  visits: { [key: string]: Visitor };
 
   /**
    * The property we have for helping database migrations.
