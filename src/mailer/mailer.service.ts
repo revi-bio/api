@@ -42,7 +42,6 @@ export class MailerService {
       const result = await this.transporter.sendMail(options);
       return result;
     } catch (error) {
-      console.log('Nodemailer error:', error);
       throw new Error('Failed to send email');
     }
   }
