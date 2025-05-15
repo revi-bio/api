@@ -66,14 +66,27 @@ export class BioService {
   }
 
   async getTodaysVisitContainer(bio: BioDocument): Promise<BioVisitContainerDocument> {
+    // Get the current date in the local timezone
     const today = new Date();
+    // Set the time to the start of the day (00:00:00)
     const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    // Set the time to the end of the day (23:59:59.999)
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
 
-    let container = await this.bioVisitContainerModel.findOne({ bio, createdAt: { $gte: startOfDay, $lt: endOfDay } });
+    // Try to find a container for today
+    let container = await this.bioVisitContainerModel.findOne({
+      bio: bio._id,
+      createdAt: { $gte: startOfDay, $lte: endOfDay }
+    });
+
+    // If no container exists for today, create a new one
     if (!container) {
-      container = new this.bioVisitContainerModel({ bio });
-      await container.save(); // Save the new container to the database
+      container = new this.bioVisitContainerModel({
+        bio: bio._id,
+        visits: [],
+        createdAt: today // Explicitly set createdAt to today
+      });
+      await container.save();
     }
 
     return container;
