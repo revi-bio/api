@@ -3,11 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Collections } from 'src/types/Collections';
 import { Bio, BioDocument } from 'src/types/schema/Bio';
+import { BioVisitContainer, BioVisitContainerDocument } from 'src/types/schema/BioView';
 import { User } from 'src/types/schema/User';
 
 @Injectable()
 export class BioService {
-  constructor(@InjectModel(Collections.Bio) private readonly bioModel: Model<Bio>) { }
+  constructor(
+    @InjectModel(Collections.Bio) private readonly bioModel: Model<Bio>,
+    @InjectModel(Collections.BioVisitContainer) private readonly bioVisitContainerModel: Model<BioVisitContainer>,
+  ) { }
 
   async findById(id: Types.ObjectId) {
     return await this.bioModel.findById(id);
@@ -57,4 +61,14 @@ export class BioService {
     return bio.pages;
   }
 
+  async getAllVisitContainers(bio: BioDocument): Promise<BioVisitContainerDocument[]> {
+    return await this.bioVisitContainerModel.find({ bio });
+  }
+
+  async getTodaysVisitContainer(bio: BioDocument): Promise<BioVisitContainerDocument> {
+    let container = await this.bioVisitContainerModel.findOne({ bio, createdAt: new Date() });
+    if (!container) container = new this.bioVisitContainerModel({ bio });
+
+    return container;
+  }
 }

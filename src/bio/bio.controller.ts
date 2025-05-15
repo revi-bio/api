@@ -11,15 +11,19 @@ import {
   UseInterceptors,
   UploadedFile,
   ForbiddenException,
+  Headers,
+  BadRequestException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { BioService } from './bio.service';
 import { CurrentUser } from 'src/user/user.decorator';
 import { UserService } from 'src/user/user.service';
 import { JwtData } from 'src/types/JwtData';
-import { CreateBioDto, EditBioDto } from './bio.validation';
+import { CreateBioDto, EditBioDto, SubmitClickDto, SubmitViewDto } from './bio.validation';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from 'src/file/file.service';
 import { Public } from 'src/auth/public.decorator';
+import * as murmur from 'murmurhash3js';
 
 @Controller('bio')
 export class BioController {
@@ -28,6 +32,78 @@ export class BioController {
     private readonly userService: UserService,
     private readonly fileService: FileService,
   ) {}
+
+  @Post(':handle/visitor/visitorid/click')
+  async submitClick(
+    @Body() body: string,
+    @Headers('Challenge-Answer') challengeAnswer: number,
+    @Param('handle') handle: string,
+    @Param('visitorid') visitorId: number,
+  ) {
+    if (['link', 'steam', 'instagram', 'youtube'].includes(body))
+      throw new BadRequestException();
+
+    const dbBio = await this.bioService.findByHandle(handle);
+    if (!dbBio) throw new NotFoundException();
+
+    const container = await this.bioService.getTodaysVisitContainer(dbBio);
+    if (!container.visits[visitorId].challengeCompleted) {
+      if (container.visits[visitorId].challengeAnswer != challengeAnswer)
+        throw new UnauthorizedException();
+
+      container.visits[visitorId].challengeCompleted = true;
+    }
+
+    container.visits[visitorId].clicks.push(body);
+    container.markModified('visits');
+    await container.save();
+  }
+
+  @Post(':handle/visitor/:visitorid/view')
+  async submitView(
+    @Headers('Challenge-Answer') challengeAnswer: number,
+    @Param('handle') handle: string,
+    @Param('visitorid') visitorId: number,
+  ) {
+    const dbBio = await this.bioService.findByHandle(handle);
+    if (!dbBio) throw new NotFoundException();
+
+    const container = await this.bioService.getTodaysVisitContainer(dbBio);
+    if (!container.visits[visitorId].challengeCompleted) {
+      if (container.visits[visitorId].challengeAnswer != challengeAnswer)
+        throw new UnauthorizedException();
+
+      container.visits[visitorId].challengeCompleted = true;
+    }
+
+    container.markModified('visits');
+    await container.save();
+  }
+
+  @Get(':handle/visitor/:visitorid/challenge')
+  async requestChallenge(
+    @Param('handle') handle: string,
+    @Param('visitorid') visitorId: number,
+  ) {
+    const dbBio = await this.bioService.findByHandle(handle);
+    if (!dbBio) throw new NotFoundException();
+
+    const container = await this.bioService.getTodaysVisitContainer(dbBio);
+    const answer = Math.ceil(Math.random() * 1000000);
+    const challenge = murmur.x86.hash128(`secret`, answer);
+
+    container.visits[visitorId] = {
+      clicks: [],
+      countryCode: 'hu',
+      referrer: undefined,
+      challengeAnswer: answer,
+    };
+
+    container.markModified('visits');
+    await container.save();
+
+    return challenge;
+  }
 
   @Get()
   async getBios(@CurrentUser() currentUser: JwtData) {
