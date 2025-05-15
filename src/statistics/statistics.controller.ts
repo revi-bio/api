@@ -23,17 +23,9 @@ export class StatisticsController {
             };
         }
         
-        // Get visit containers for all user's bios
-        const bioIds = userBios.map(bio => bio._id);
-        
-        // Calculate total views and clicks for user's bios
-        let totalViews = 0;
-        let totalClicks = 0;
-        
-        for (const bioId of bioIds) {
-            totalViews += await this.statisticsService.getTotalViews(bioId);
-            totalClicks += await this.statisticsService.getTotalClicks(bioId);
-        }
+        // Calculate total views and clicks for all user's bios in one go
+        const totalViews = await this.statisticsService.getTotalViews();
+        const totalClicks = await this.statisticsService.getTotalClicks();
         
         // For now, we'll keep the avgSecondsOnSites as a static value
         // In the future, this could be calculated from actual session data
@@ -54,23 +46,8 @@ export class StatisticsController {
             return {};
         }
         
-        // Combine country distributions from all user's bios
-        const countryDistribution: Record<string, number> = {};
-        
-        for (const bio of userBios) {
-            const bioDist = await this.statisticsService.getCountryDistribution(bio._id);
-            
-            for (const [country, count] of Object.entries(bioDist)) {
-                countryDistribution[country] = (countryDistribution[country] || 0) + count;
-            }
-        }
-        
-        // Sort by count in descending order and limit to top 5
-        return Object.fromEntries(
-            Object.entries(countryDistribution)
-                .sort(([, a], [, b]) => b - a)
-                .slice(0, 5)
-        );
+        // Get country distribution for all bios at once
+        return await this.statisticsService.getCountryDistribution();
     }
 
     @Get('socials')
@@ -82,22 +59,8 @@ export class StatisticsController {
             return {};
         }
         
-        // Combine social distributions from all user's bios
-        const socialDistribution: Record<string, number> = {};
-        
-        for (const bio of userBios) {
-            const bioDist = await this.statisticsService.getSocialDistribution(bio._id);
-            
-            for (const [social, count] of Object.entries(bioDist)) {
-                socialDistribution[social] = (socialDistribution[social] || 0) + count;
-            }
-        }
-        
-        // Sort by count in descending order
-        return Object.fromEntries(
-            Object.entries(socialDistribution)
-                .sort(([, a], [, b]) => b - a)
-        );
+        // Get social distribution for all bios at once
+        return await this.statisticsService.getSocialDistribution();
     }
 
     @Get('views')
@@ -109,18 +72,8 @@ export class StatisticsController {
             return Array(30).fill(0);
         }
         
-        // Combine view timelines from all user's bios
-        const combinedTimeline = Array(30).fill(0);
-        
-        for (const bio of userBios) {
-            const bioTimeline = await this.statisticsService.getViewsTimeline(bio._id);
-            
-            for (let i = 0; i < bioTimeline.length; i++) {
-                combinedTimeline[i] += bioTimeline[i];
-            }
-        }
-        
-        return combinedTimeline;
+        // Get views timeline for all bios at once
+        return await this.statisticsService.getViewsTimeline();
     }
 
     @Get('referral-distribution')
@@ -132,22 +85,8 @@ export class StatisticsController {
             return {};
         }
         
-        // Combine referral distributions from all user's bios
-        const referralDistribution: Record<string, number> = {};
-        
-        for (const bio of userBios) {
-            const bioDist = await this.statisticsService.getReferralDistribution(bio._id);
-            
-            for (const [referrer, count] of Object.entries(bioDist)) {
-                referralDistribution[referrer] = (referralDistribution[referrer] || 0) + count;
-            }
-        }
-        
-        // Sort by count in descending order
-        return Object.fromEntries(
-            Object.entries(referralDistribution)
-                .sort(([, a], [, b]) => b - a)
-        );
+        // Get referral distribution for all bios at once
+        return await this.statisticsService.getReferralDistribution();
     }
 
     // Bio-specific endpoints

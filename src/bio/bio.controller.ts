@@ -51,6 +51,10 @@ export class BioController {
     // Find the visitor in the array
     let visitor = container.visits.find(v => v.visitorId === visitorId);
     
+    if (!visitor) {
+      throw new NotFoundException('Visitor not found');
+    }
+    
     if (!visitor.challengeCompleted) {
       if (visitor.challengeAnswer != challengeAnswer)
         throw new UnauthorizedException();
@@ -77,6 +81,10 @@ export class BioController {
     // Find the visitor in the array
     let visitor = container.visits.find(v => v.visitorId === visitorId);
     
+    if (!visitor) {
+      throw new NotFoundException('Visitor not found');
+    }
+    
     if (!visitor.challengeCompleted) {
       if (visitor.challengeAnswer != challengeAnswer)
         throw new UnauthorizedException();
@@ -92,6 +100,8 @@ export class BioController {
   async requestChallenge(
     @Param('handle') handle: string,
     @Param('visitorid') visitorId: string,
+    @Headers('X-Country-Code') countryCode: string = 'unknown',
+    @Headers('Referer') referrer?: string,
   ) {
     const dbBio = await this.bioService.findByHandle(handle);
     if (!dbBio) throw new NotFoundException();
@@ -111,15 +121,13 @@ export class BioController {
       visitor = {
         visitorId,
         clicks: [],
-        countryCode: 'hu',
-        referrer: undefined,
+        countryCode: countryCode || 'unknown',
+        referrer: referrer,
         challengeAnswer: answer,
         challengeCompleted: false,
       };
       container.visits.push(visitor);
     }
-
-    console.log(container);
 
     container.markModified('visits');
     await container.save();

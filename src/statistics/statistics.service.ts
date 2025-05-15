@@ -50,7 +50,7 @@ export class StatisticsService {
     const visitContainers = await this.bioVisitContainerModel.find(query);
     
     return visitContainers.reduce((total, container) => {
-      return total + Object.keys(container.visits).length;
+      return total + container.visits.length;
     }, 0);
   }
 
@@ -68,7 +68,7 @@ export class StatisticsService {
     const visitContainers = await this.bioVisitContainerModel.find(query);
     
     return visitContainers.reduce((total, container) => {
-      return total + Object.values(container.visits).reduce((clickTotal, visitor: Visitor) => {
+      return total + container.visits.reduce((clickTotal, visitor: Visitor) => {
         return clickTotal + visitor.clicks.length;
       }, 0);
     }, 0);
@@ -90,7 +90,7 @@ export class StatisticsService {
     const countryDistribution: Record<string, number> = {};
     
     visitContainers.forEach(container => {
-      Object.values(container.visits).forEach((visitor: Visitor) => {
+      container.visits.forEach((visitor: Visitor) => {
         const countryCode = visitor.countryCode || 'unknown';
         countryDistribution[countryCode] = (countryDistribution[countryCode] || 0) + 1;
       });
@@ -120,7 +120,7 @@ export class StatisticsService {
     const socialDistribution: Record<string, number> = {};
     
     visitContainers.forEach(container => {
-      Object.values(container.visits).forEach((visitor: Visitor) => {
+      container.visits.forEach((visitor: Visitor) => {
         visitor.clicks.forEach(click => {
           socialDistribution[click] = (socialDistribution[click] || 0) + 1;
         });
@@ -150,7 +150,7 @@ export class StatisticsService {
     const referralDistribution: Record<string, number> = {};
     
     visitContainers.forEach(container => {
-      Object.values(container.visits).forEach((visitor: Visitor) => {
+      container.visits.forEach((visitor: Visitor) => {
         if (visitor.referrer) {
           const referrer = visitor.referrer;
           referralDistribution[referrer] = (referralDistribution[referrer] || 0) + 1;
@@ -197,7 +197,7 @@ export class StatisticsService {
       const dayDiff = Math.floor((endDate.getTime() - containerDate.getTime()) / (1000 * 60 * 60 * 24));
       
       if (dayDiff >= 0 && dayDiff < days) {
-        timeline[days - 1 - dayDiff] += Object.keys(container.visits).length;
+        timeline[days - 1 - dayDiff] += container.visits.length;
       }
     });
     
