@@ -24,8 +24,8 @@ export class StatisticsController {
         }
         
         // Calculate total views and clicks for all user's bios in one go
-        const totalViews = await this.statisticsService.getTotalViews();
-        const totalClicks = await this.statisticsService.getTotalClicks();
+        const totalViews = await this.statisticsService.getTotalViews(undefined, currentUser.id);
+        const totalClicks = await this.statisticsService.getTotalClicks(undefined, currentUser.id);
         
         // For now, we'll keep the avgSecondsOnSites as a static value
         // In the future, this could be calculated from actual session data
@@ -47,7 +47,7 @@ export class StatisticsController {
         }
         
         // Get country distribution for all bios at once
-        return await this.statisticsService.getCountryDistribution();
+        return await this.statisticsService.getCountryDistribution(undefined, currentUser.id);
     }
 
     @Get('socials')
@@ -60,7 +60,7 @@ export class StatisticsController {
         }
         
         // Get social distribution for all bios at once
-        return await this.statisticsService.getSocialDistribution();
+        return await this.statisticsService.getSocialDistribution(undefined, currentUser.id);
     }
 
     @Get('views')
@@ -73,7 +73,7 @@ export class StatisticsController {
         }
         
         // Get views timeline for all bios at once
-        return await this.statisticsService.getViewsTimeline();
+        return await this.statisticsService.getViewsTimeline(undefined, 30, currentUser.id);
     }
 
     @Get('referral-distribution')
@@ -86,7 +86,7 @@ export class StatisticsController {
         }
         
         // Get referral distribution for all bios at once
-        return await this.statisticsService.getReferralDistribution();
+        return await this.statisticsService.getReferralDistribution(undefined, currentUser.id);
     }
 
     // Bio-specific endpoints

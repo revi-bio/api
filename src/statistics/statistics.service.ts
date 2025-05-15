@@ -36,7 +36,7 @@ export class StatisticsService {
     return await this.bioModel.find({ user: userId });
   }
 
-  async getTotalViews(bioId?: string | Types.ObjectId): Promise<number> {
+  async getTotalViews(bioId?: string | Types.ObjectId, userId?: string | Types.ObjectId): Promise<number> {
     let query = {};
     
     if (bioId) {
@@ -45,6 +45,14 @@ export class StatisticsService {
         throw new NotFoundException('Bio not found');
       }
       query = { bio: bio._id };
+    } else if (userId) {
+      // If userId is provided but no bioId, get all bios for this user
+      const userBios = await this.bioModel.find({ user: userId });
+      if (!userBios || userBios.length === 0) {
+        return 0;
+      }
+      const bioIds = userBios.map(bio => bio._id);
+      query = { bio: { $in: bioIds } };
     }
     
     const visitContainers = await this.bioVisitContainerModel.find(query);
@@ -54,7 +62,7 @@ export class StatisticsService {
     }, 0);
   }
 
-  async getTotalClicks(bioId?: string | Types.ObjectId): Promise<number> {
+  async getTotalClicks(bioId?: string | Types.ObjectId, userId?: string | Types.ObjectId): Promise<number> {
     let query = {};
     
     if (bioId) {
@@ -63,6 +71,14 @@ export class StatisticsService {
         throw new NotFoundException('Bio not found');
       }
       query = { bio: bio._id };
+    } else if (userId) {
+      // If userId is provided but no bioId, get all bios for this user
+      const userBios = await this.bioModel.find({ user: userId });
+      if (!userBios || userBios.length === 0) {
+        return 0;
+      }
+      const bioIds = userBios.map(bio => bio._id);
+      query = { bio: { $in: bioIds } };
     }
     
     const visitContainers = await this.bioVisitContainerModel.find(query);
@@ -74,7 +90,7 @@ export class StatisticsService {
     }, 0);
   }
 
-  async getCountryDistribution(bioId?: string | Types.ObjectId): Promise<Record<string, number>> {
+  async getCountryDistribution(bioId?: string | Types.ObjectId, userId?: string | Types.ObjectId): Promise<Record<string, number>> {
     let query = {};
     
     if (bioId) {
@@ -83,6 +99,14 @@ export class StatisticsService {
         throw new NotFoundException('Bio not found');
       }
       query = { bio: bio._id };
+    } else if (userId) {
+      // If userId is provided but no bioId, get all bios for this user
+      const userBios = await this.bioModel.find({ user: userId });
+      if (!userBios || userBios.length === 0) {
+        return {};
+      }
+      const bioIds = userBios.map(bio => bio._id);
+      query = { bio: { $in: bioIds } };
     }
     
     const visitContainers = await this.bioVisitContainerModel.find(query);
@@ -104,7 +128,7 @@ export class StatisticsService {
     );
   }
 
-  async getSocialDistribution(bioId?: string | Types.ObjectId): Promise<Record<string, number>> {
+  async getSocialDistribution(bioId?: string | Types.ObjectId, userId?: string | Types.ObjectId): Promise<Record<string, number>> {
     let query = {};
     
     if (bioId) {
@@ -113,6 +137,14 @@ export class StatisticsService {
         throw new NotFoundException('Bio not found');
       }
       query = { bio: bio._id };
+    } else if (userId) {
+      // If userId is provided but no bioId, get all bios for this user
+      const userBios = await this.bioModel.find({ user: userId });
+      if (!userBios || userBios.length === 0) {
+        return {};
+      }
+      const bioIds = userBios.map(bio => bio._id);
+      query = { bio: { $in: bioIds } };
     }
     
     const visitContainers = await this.bioVisitContainerModel.find(query);
@@ -134,7 +166,7 @@ export class StatisticsService {
     );
   }
 
-  async getReferralDistribution(bioId?: string | Types.ObjectId): Promise<Record<string, number>> {
+  async getReferralDistribution(bioId?: string | Types.ObjectId, userId?: string | Types.ObjectId): Promise<Record<string, number>> {
     let query = {};
     
     if (bioId) {
@@ -143,6 +175,14 @@ export class StatisticsService {
         throw new NotFoundException('Bio not found');
       }
       query = { bio: bio._id };
+    } else if (userId) {
+      // If userId is provided but no bioId, get all bios for this user
+      const userBios = await this.bioModel.find({ user: userId });
+      if (!userBios || userBios.length === 0) {
+        return {};
+      }
+      const bioIds = userBios.map(bio => bio._id);
+      query = { bio: { $in: bioIds } };
     }
     
     const visitContainers = await this.bioVisitContainerModel.find(query);
@@ -165,7 +205,7 @@ export class StatisticsService {
     );
   }
 
-  async getViewsTimeline(bioId?: string | Types.ObjectId, days: number = 30): Promise<number[]> {
+  async getViewsTimeline(bioId?: string | Types.ObjectId, days: number = 30, userId?: string | Types.ObjectId): Promise<number[]> {
     let query = {};
     
     if (bioId) {
@@ -174,6 +214,14 @@ export class StatisticsService {
         throw new NotFoundException('Bio not found');
       }
       query = { bio: bio._id };
+    } else if (userId) {
+      // If userId is provided but no bioId, get all bios for this user
+      const userBios = await this.bioModel.find({ user: userId });
+      if (!userBios || userBios.length === 0) {
+        return Array(days).fill(0);
+      }
+      const bioIds = userBios.map(bio => bio._id);
+      query = { bio: { $in: bioIds } };
     }
     
     // Get date range for the last 'days' days
