@@ -9,6 +9,7 @@ import { Bio } from './Bio';
 export type BioVisitContainerDocument = HydratedDocument<BioVisitContainer>;
 
 export interface Visitor {
+  visitorId: string;
   countryCode: string;
   clicks: string[];
   referrer?: string;
@@ -29,8 +30,8 @@ export class BioVisitContainer {
   @Prop({ required: true, type: Types.ObjectId, ref: Collections.Bio })
   bio: Bio;
 
-  @Prop({ required: true, type: Object, default: [] })
-  visits: { [key: string]: Visitor };
+  @Prop({ required: true, type: Array, default: [] })
+  visits: Visitor[];
 
   /**
    * The property we have for helping database migrations.

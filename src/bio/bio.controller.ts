@@ -38,7 +38,7 @@ export class BioController {
     @Body() body: string,
     @Headers('Challenge-Answer') challengeAnswer: number,
     @Param('handle') handle: string,
-    @Param('visitorid') visitorId: number,
+    @Param('visitorid') visitorId: string,
   ) {
     if (['link', 'steam', 'instagram', 'youtube'].includes(body))
       throw new BadRequestException();
@@ -48,25 +48,30 @@ export class BioController {
 
     const container = await this.bioService.getTodaysVisitContainer(dbBio);
     
-    // Check if the visitor exists, if not create it
-    if (!container.visits[visitorId]) {
-      container.visits[visitorId] = {
+    // Find the visitor in the array
+    let visitor = container.visits.find(v => v.visitorId === visitorId);
+    
+    // If visitor doesn't exist, create it
+    if (!visitor) {
+      visitor = {
+        visitorId,
         clicks: [],
         countryCode: 'hu',
         referrer: undefined,
         challengeAnswer: 0, // Default value, will be overridden if challenge is requested
         challengeCompleted: false,
       };
+      container.visits.push(visitor);
     }
     
-    if (!container.visits[visitorId].challengeCompleted) {
-      if (container.visits[visitorId].challengeAnswer != challengeAnswer)
+    if (!visitor.challengeCompleted) {
+      if (visitor.challengeAnswer != challengeAnswer)
         throw new UnauthorizedException();
 
-      container.visits[visitorId].challengeCompleted = true;
+      visitor.challengeCompleted = true;
     }
 
-    container.visits[visitorId].clicks.push(body);
+    visitor.clicks.push(body);
     container.markModified('visits');
     await container.save();
   }
@@ -82,22 +87,27 @@ export class BioController {
 
     const container = await this.bioService.getTodaysVisitContainer(dbBio);
     
-    // Check if the visitor exists, if not create it
-    if (!container.visits[visitorId]) {
-      container.visits[visitorId] = {
+    // Find the visitor in the array
+    let visitor = container.visits.find(v => v.visitorId === visitorId);
+    
+    // If visitor doesn't exist, create it
+    if (!visitor) {
+      visitor = {
+        visitorId,
         clicks: [],
         countryCode: 'hu',
         referrer: undefined,
         challengeAnswer: 0, // Default value, will be overridden if challenge is requested
         challengeCompleted: false,
       };
+      container.visits.push(visitor);
     }
     
-    if (!container.visits[visitorId].challengeCompleted) {
-      if (container.visits[visitorId].challengeAnswer != challengeAnswer)
+    if (!visitor.challengeCompleted) {
+      if (visitor.challengeAnswer != challengeAnswer)
         throw new UnauthorizedException();
 
-      container.visits[visitorId].challengeCompleted = true;
+      visitor.challengeCompleted = true;
     }
 
     container.markModified('visits');
@@ -116,13 +126,24 @@ export class BioController {
     const answer = Math.ceil(Math.random() * 1000000);
     const challenge = murmur.x86.hash128(`secret`, answer);
 
-    container.visits[visitorId] = {
-      clicks: [],
-      countryCode: 'hu',
-      referrer: undefined,
-      challengeAnswer: answer,
-      challengeCompleted: false,
-    };
+    // Find the visitor in the array
+    let visitor = container.visits.find(v => v.visitorId === visitorId);
+    
+    // If visitor exists, update it, otherwise create a new one
+    if (visitor) {
+      visitor.challengeAnswer = answer;
+      visitor.challengeCompleted = false;
+    } else {
+      visitor = {
+        visitorId,
+        clicks: [],
+        countryCode: 'hu',
+        referrer: undefined,
+        challengeAnswer: answer,
+        challengeCompleted: false,
+      };
+      container.visits.push(visitor);
+    }
 
     console.log(container);
 
